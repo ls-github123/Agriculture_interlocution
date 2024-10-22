@@ -12,5 +12,5 @@ Windows端-powershell生成 SSH密钥对
 # 为 p5_project_Agriculture_interlocution 仓库单独配置 SSH 密钥
 Host Agriculture_interlocution
   HostName github.com
-  User (自己姓名信息)
+  User 宋金玺
   IdentityFile  D:/ssh-key/....
