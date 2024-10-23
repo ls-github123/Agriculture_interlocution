@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders', # 跨域配置
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
