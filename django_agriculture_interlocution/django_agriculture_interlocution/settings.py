@@ -96,6 +96,7 @@ DATABASES = {
             'connect_timeout': 10, # 连接超时(秒)
             'read_timeout': 30, # 读取超时(秒)
             'write_timeout': 30, # 写入超时(秒)
+            'ssl': {'ssl-mode': 'DISABLED'},  # 禁用 SSL 验证
         },
     }
 }
