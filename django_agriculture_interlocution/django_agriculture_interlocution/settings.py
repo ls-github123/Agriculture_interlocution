@@ -11,7 +11,9 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-
+# python-decouple包, 导入本地.env配置信息(mysql数据库地址、密码、端口等),该信息不会被git同步
+from decouple import config
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,8 +27,8 @@ SECRET_KEY = 'django-insecure-#wm$u&@(9*z=wbzh$r$!zl^5jscyjl==^4q$a71zwi$xv%ux_s
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*']
+CORS_ORIGIN_ALLOW_ALL = True # 配置跨域,允许所有访问
 
 # Application definition
 
@@ -37,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders', # 跨域配置
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -47,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware', # 跨域配置中间件
 ]
 
 ROOT_URLCONF = 'django_agriculture_interlocution.urls'
@@ -74,9 +79,23 @@ WSGI_APPLICATION = 'django_agriculture_interlocution.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # }
+    
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        "ENGINE":"dj_db_conn_pool.backends.mysql", # 使用连接池的 MySQL 引擎
+        "NAME": config('DB_NAME'), # 数据库名称
+        "USER": config('DB_USER'), # 数据库用户
+        "PASSWORD": config('DB_PASSWORD'), # 数据库密码
+        "HOST": config('DB_HOST', default='localhost'), # 数据库主机地址
+        "PORT": config('DB_PORT', default='3306'), # 数据库端口
+        "POOL_OPTIONS": { # 连接池配置
+            'POOL_SIZE': 10, # 初始化连接池大小
+            'MAX_OVERFLOW': 10,  # 最大溢出连接数量（超过初始池大小时的额外连接数）
+            # 'RECYCLE': 24 * 60 * 60  # 可选，连接回收时间，防止长期连接被关闭
+        }
     }
 }
 
@@ -103,9 +122,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-Hans'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 
