@@ -14,6 +14,7 @@ from pathlib import Path
 # python-decouple包, 导入本地.env配置信息(mysql数据库地址、密码、端口等),该信息不会被git同步
 from decouple import config
 import os
+from sqlalchemy.pool import QueuePool # 添加数据库连接池配置
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -40,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders', # 跨域配置
-    'rest_framework',
+    'rest_framework', # DRF支持
 ]
 
 MIDDLEWARE = [
@@ -78,24 +79,30 @@ WSGI_APPLICATION = 'django_agriculture_interlocution.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# 数据库配置，使用mysqlclient
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': BASE_DIR / 'db.sqlite3',
-    # }
-    
     'default': { # config 从.env文件中读取mysql机密配置信息
-        "ENGINE":"dj_db_conn_pool.backends.mysql", # 使用连接池的 MySQL 引擎
+        "ENGINE":"django.db.backends.mysql", # 使用nei的 MySQL 引擎
         "NAME": config('DB_NAME'), # 数据库名称
         "USER": config('DB_USER'), # 数据库用户
         "PASSWORD": config('DB_PASSWORD'), # 数据库密码
         "HOST": config('DB_HOST', default='localhost'), # 数据库主机地址
         "PORT": config('DB_PORT', default='3306'), # 数据库端口
-        "POOL_OPTIONS": { # 连接池配置
-            'POOL_SIZE': 10, # 初始化连接池大小
-            'MAX_OVERFLOW': 10,  # 最大溢出连接数量（超过初始池大小时的额外连接数）
-            # 'RECYCLE': 24 * 60 * 60  # 可选，连接回收时间，防止长期连接被关闭
-        }
+        "OPTIONS": { # 数据库连接高级选项
+            # init_command 初始化连接时执行的 SQL 语句
+            # STRICT_TRANS_TABLES 模式要求 MySQL 在插入无效数据时抛出错误，而不是进行数据截断
+            'init_command':"SET sql_mode='STRICT_TRANS_TABLES'",
+            'charset': 'utf8mb4', # 指定数据库的字符集为 utf8mb4
+            'connect_timeout': 10, # 连接超时(秒)
+            'read_timeout': 30, # 读取超时(秒)
+            'write_timeout': 30, # 写入超时(秒)
+            
+            # 连接池配置（mysqlclient 支持）
+            'pool_name': 'django_pool', # 连接池名称
+            'pool_size': 10, # 连接池初始大小
+            'max_overflow': 5, # 超出池后的最大连接数
+            'pool_recycle': 3600, # 每小时回收连接--每个连接在使用超过 3600 秒（1 小时）后会被重置
+        },
     }
 }
 
