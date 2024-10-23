@@ -11,7 +11,9 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-
+# python-decouple包, 导入本地.env配置信息(mysql数据库地址、密码、端口等),该信息不会被git同步
+from decouple import config
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -76,9 +78,23 @@ WSGI_APPLICATION = 'django_agriculture_interlocution.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # }
+    
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        "ENGINE":"dj_db_conn_pool.backends.mysql", # 使用连接池的 MySQL 引擎
+        "NAME": config('DB_NAME'), # 数据库名称
+        "USER": config('DB_USER'), # 数据库用户
+        "PASSWORD": config('DB_PASSWORD'), # 数据库密码
+        "HOST": config('DB_HOST', default='localhost'), # 数据库主机地址
+        "PORT": config('DB_PORT', default='3306'), # 数据库端口
+        "POOL_OPTIONS": { # 连接池配置
+            'POOL_SIZE': 10, # 初始化连接池大小
+            'MAX_OVERFLOW': 10,  # 最大溢出连接数量（超过初始池大小时的额外连接数）
+            # 'RECYCLE': 24 * 60 * 60  # 可选，连接回收时间，防止长期连接被关闭
+        }
     }
 }
 
