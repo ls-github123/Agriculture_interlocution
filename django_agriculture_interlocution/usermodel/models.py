@@ -12,3 +12,21 @@ class User(models.Model):
 
     def __str__(self):
         return self.username
+    
+
+    from django.db import models
+
+class ThirdPartyLogin(models.Model):
+    id = models.AutoField(primary_key=True)  # 自增主键
+    user_id = models.IntegerField()  # 用户ID
+    uid = models.CharField(max_length=255)  # 第三方用户ID
+    token = models.CharField(max_length=255)  # 认证令牌
+    style = models.CharField(max_length=50)  # 登录方式，如：dd, weibo, wx
+
+    def __str__(self):
+        return f"ThirdPartyLogin {self.id}: {self.user_id} - {self.style}"
+
+    class Meta:
+        db_table = 'third_party_login'  # 指定数据库表名
+        verbose_name = '三方登录'
+        verbose_name_plural = '三方登录记录'
