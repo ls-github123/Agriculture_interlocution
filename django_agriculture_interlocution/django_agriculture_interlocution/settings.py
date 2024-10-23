@@ -84,7 +84,7 @@ DATABASES = {
     #     'NAME': BASE_DIR / 'db.sqlite3',
     # }
     
-    'default': {
+    'default': { # config 从.env文件中读取mysql机密配置信息
         "ENGINE":"dj_db_conn_pool.backends.mysql", # 使用连接池的 MySQL 引擎
         "NAME": config('DB_NAME'), # 数据库名称
         "USER": config('DB_USER'), # 数据库用户
@@ -98,6 +98,52 @@ DATABASES = {
         }
     }
 }
+
+# redis数据库配置
+# config从.env文件中读取redis机密配置信息
+REDIS_HOST = config('REDIS_HOST', default='localhost')
+REDIS_PORT = config('REDIS_PORT', default=6379, cast=int)
+REDIS_PASSWORD = config('REDIS_PASSWORD', default='')
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/0",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            # 连接池配置
+            "CONNECTION_POOL_KWARGS": {"max_connections": 100}
+        }
+    },
+    "session": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        # "LOCATION": "redis://127.0.0.1:6379/1",
+        # LOCATION:'reids://:密码@IP地址：端口号/库编号'
+        "LOCATION": f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            # 连接池的配置
+            "CONNECTION_POOL_KWARGS": {"max_connections": 100}
+        }
+    },
+    
+    # 配置站点 短信验证码
+    "sms_code": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/2",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            # 连接池的配置
+            "CONNECTION_POOL_KWARGS": {"max_connections": 100}
+        }
+    },
+}
+
+# session存储配置
+# session引擎配置 -- 指定 Django 使用 缓存 (cache) 作为会话数据的存储位置，而非默认的数据库
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+# 指定缓存的别名
+SESSION_CACHE_ALIAS = "session"
 
 
 # Password validation
