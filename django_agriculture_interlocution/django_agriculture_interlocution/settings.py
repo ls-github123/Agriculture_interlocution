@@ -14,7 +14,6 @@ from pathlib import Path
 # python-decouple包, 导入本地.env配置信息(mysql数据库地址、密码、端口等),该信息不会被git同步
 from decouple import config
 import os
-from sqlalchemy.pool import QueuePool # 添加数据库连接池配置
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -97,11 +96,6 @@ DATABASES = {
             'connect_timeout': 10, # 连接超时(秒)
             'read_timeout': 30, # 读取超时(秒)
             'write_timeout': 30, # 写入超时(秒)
-            # # 连接池配置（mysqlclient 支持）
-            # 'pool_name': 'django_pool', # 连接池名称
-            # 'pool_size': 10, # 连接池初始大小
-            # 'max_overflow': 5, # 超出池后的最大连接数
-            # 'pool_recycle': 3600, # 每小时回收连接--每个连接在使用超过 3600 秒（1 小时）后会被重置
         },
     }
 }
