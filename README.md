@@ -12,6 +12,12 @@ Windows端-powershell生成 SSH密钥对
 # 为 p5_project_Agriculture_interlocution 仓库单独配置 SSH 密钥
 Host Agriculture_interlocution
   HostName github.com
-  User 宋金玺
+  User (本人姓名)
   IdentityFile  D:/ssh-key/....
-  测试
+
+# 在Conda环境中导出依赖包目录<-->根据依赖包目录导入对应依赖
+# (导出 pip 依赖并让团队成员导入)
+  导出并更新目录为requirements.txt文件命令 --> pip freeze > requirements.txt
+  在新环境中使用 requirements.txt 安装 pip 依赖命令 --> pip install -r requirements.txt
+
+  列出现有 Conda 虚拟环境的依赖命令 --> conda list
