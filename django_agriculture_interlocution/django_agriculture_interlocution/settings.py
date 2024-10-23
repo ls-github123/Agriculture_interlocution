@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders', # 跨域配置
     'rest_framework', # DRF支持
+    'usermodel',
 ]
 
 MIDDLEWARE = [
@@ -96,12 +97,11 @@ DATABASES = {
             'connect_timeout': 10, # 连接超时(秒)
             'read_timeout': 30, # 读取超时(秒)
             'write_timeout': 30, # 写入超时(秒)
-            
-            # 连接池配置（mysqlclient 支持）
-            'pool_name': 'django_pool', # 连接池名称
-            'pool_size': 10, # 连接池初始大小
-            'max_overflow': 5, # 超出池后的最大连接数
-            'pool_recycle': 3600, # 每小时回收连接--每个连接在使用超过 3600 秒（1 小时）后会被重置
+            # # 连接池配置（mysqlclient 支持）
+            # 'pool_name': 'django_pool', # 连接池名称
+            # 'pool_size': 10, # 连接池初始大小
+            # 'max_overflow': 5, # 超出池后的最大连接数
+            # 'pool_recycle': 3600, # 每小时回收连接--每个连接在使用超过 3600 秒（1 小时）后会被重置
         },
     }
 }
