@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import serve from '../components/serve.vue';
 
 const routes = [
-    { path: '/', component: serve },
+    { path: '/', component: Serve },
     {path:''},
 ];
 
