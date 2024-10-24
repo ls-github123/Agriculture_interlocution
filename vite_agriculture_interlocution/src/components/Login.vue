@@ -6,15 +6,15 @@
 </template>
 
 <script setup>
-import { redirectToAuthing, fetchAccessToken } from '../utils/authing';
+import { redirectToAuthing, fetchAccessToken } from '../utils/authing'; //导入获取token的方法(即Authing登录集成配置)
 import { useRouter, useRoute } from 'vue-router';
 import { onMounted } from 'vue';
 
-const router = useRouter();
+const router = useRouter(); 
 const route = useRoute();
 
 const login = () => {
-    redirectToAuthing(); // 跳转到Authing登录页
+    redirectToAuthing(); // 跳转到Authing托管登录页
 };
 
 // 在回调页解析授权码并请求 access_token
