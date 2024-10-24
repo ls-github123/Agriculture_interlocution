@@ -1,6 +1,6 @@
 # from medical.settings import SECRET_KEY
 import jwt
-from cwapi.settings import SECRET_KEY
+from django_agriculture_interlocution.settings import SECRET_KEY
 
 class MJwt():
     def __init__(self):
