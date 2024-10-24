@@ -36,10 +36,7 @@
           <h1>服务介绍</h1>
           <article>
             <img src="service-image.jpg" alt="Service Image">
-            <div>
-              <h2>种子</h2>
-              <p>匹配生态区选择优质品种，提供二次包衣、拌种等配套种子处理产品，从源头奠定种植基础。</p>
-            </div>
+            
           </article>
         </section>
       </main>
@@ -59,7 +56,7 @@
         window.location.href = "https://amap.com/";
       },
       call() {
-        window.location.href = "tel:your-phone-number";
+        window.location.href = "tel:186-6714-1302";
       }
     }
   }
