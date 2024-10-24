@@ -44,6 +44,10 @@ INSTALLED_APPS = [
     'usermodule', # 子应用-用户模块
 ]
 
+# 设置Django AUTH 用户认证系统所需用户模型
+# 格式: 子应用名.模型名  -- 必须在数据第一次迁移时配置完成
+AUTH_USER_MODEL = "usermodule.UsersModel"
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
