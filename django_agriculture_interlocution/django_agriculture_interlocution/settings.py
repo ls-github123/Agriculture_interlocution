@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders', # 跨域配置
     'rest_framework', # DRF支持
-    'usermodel',
 ]
 
 MIDDLEWARE = [
