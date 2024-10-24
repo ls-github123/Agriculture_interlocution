@@ -9,7 +9,7 @@
   
       <main>
         <section id="location-section">
-          <h1>北京市东城区东华门街道肃亲王府</h1>
+          <h1>北京市东城区东华门</h1>
           <p>距您 31.01公里</p>
           <div class="buttons">
             <button @click="navigate">导航</button>
