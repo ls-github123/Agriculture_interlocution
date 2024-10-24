@@ -1,30 +1,22 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <div id="app">
+    <router-view />  <!-- 路由视图用于渲染当前匹配的页面组件 -->
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
 
+<script setup>
+// App.vue 不需要逻辑部分，只作为布局组件
+</script>
+
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased; /* 对于 WebKit 内核的浏览器进行字体平滑 */
+  -moz-osx-font-smoothing: grayscale; /* 对于 MacOS 系统下的 Firefox 进行字体平滑 */
+  text-align: center;
+  color: #2c3e50; /* 文本颜色 */
+  margin-top: 60px;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
+
+/* 可以添加更多的样式规则来美化应用程序 */
 </style>
