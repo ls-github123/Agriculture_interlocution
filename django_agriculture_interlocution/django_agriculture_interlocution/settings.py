@@ -42,6 +42,11 @@ INSTALLED_APPS = [
     'corsheaders', # 跨域配置
     'rest_framework', # DRF支持
     'usermodule', # 子应用-用户模块
+    'servecenter',# 子应用-用户模块
+    'django.contrib.staticfiles',
+    
+
+
 ]
 
 MIDDLEWARE = [
@@ -188,3 +193,19 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# ...
+
+# 媒体文件配置
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# 静态文件配置
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# ...
