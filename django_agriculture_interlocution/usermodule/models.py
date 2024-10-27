@@ -7,8 +7,6 @@ class UsersManager(BaseUserManager):
         if not user_id:
             raise ValueError('必须提供 user_id 字段信息!')
         
-        
-        
         email = self.normalize_email(email) if email else None
         user = self.model(user_id=user_id, username=username, email=email, **extra_fields)
         user.set_unusable_password() # 标记用户没有本地密码

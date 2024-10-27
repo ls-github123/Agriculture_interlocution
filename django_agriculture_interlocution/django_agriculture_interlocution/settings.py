@@ -44,19 +44,33 @@ INSTALLED_APPS = [
     'usermodule', # 子应用-用户模块
 ]
 
+
+
 # 设置Django AUTH 用户认证系统所需用户模型
 # 格式: 子应用名.模型名  -- 必须在数据第一次迁移时配置完成
 AUTH_USER_MODEL = "usermodule.UsersModel"
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware', # CORS处理
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware', # 启用 CSRF
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware', # 跨域配置中间件
+]
+
+# 跨域请求设置
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+]
+
+CORS_ALLOW_CREDENTIALS = True  # 允许发送 Cookie
+
+# CSRF 信任来源
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:5173'
 ]
 
 ROOT_URLCONF = 'django_agriculture_interlocution.urls'
