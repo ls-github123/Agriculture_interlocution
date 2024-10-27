@@ -19,5 +19,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('user/', include('usermodule.urls')), # 子应用-用户模块
+    path('messageModule/',include('messageModule.urls'))
 ]
