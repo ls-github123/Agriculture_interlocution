@@ -21,3 +21,14 @@ Host Agriculture_interlocution
   在新环境中使用 requirements.txt 安装 pip 依赖命令 --> pip install -r requirements.txt
 
   列出现有 Conda 虚拟环境的依赖命令 --> conda list
+
+# 在标准 Web 应用中集成 Authing
+  一共牵涉到三方：终端用户浏览器、应用服务器、 Authing 服务器，完整流程如下：
+
+  1.终端用户浏览器请求应用服务，发现用户未登录，跳转到 Authing 托管的登录页。
+  2.用户在此登录页完成登录之后，终端用户浏览器会在请求参数中携带授权码 (Authorization Code) 等数据跳转到应用服务器预先配置好的回调链。
+  3.应用服务器使用授权码 (Authorization Code) 向 Authing 服务器请求换取用户信息。
+  4.应用服务器获取到用户信息之后，建立与终端用户的会话。
+  5.终端用户得到登录成功提示，认证流程完成。
+  
+  ![image](https://github.com/user-attachments/assets/b60f7b16-7f87-4678-a1f3-53db5c22fcdc)
