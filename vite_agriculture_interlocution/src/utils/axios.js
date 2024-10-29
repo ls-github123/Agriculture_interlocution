@@ -17,7 +17,7 @@ apiClient.interceptors.request.use((config) => {
     if (csrftoken) {
         config.headers['X-CSRFToken'] = csrftoken; // 设置 CSRF Token
     }
-    const accessToken = localStorage.getItem('access_token');
+    const accessToken = sessionStorage.getItem('access_token');
     if (accessToken) {
         config.headers.Authorization = `Bearer ${accessToken}`;
     }

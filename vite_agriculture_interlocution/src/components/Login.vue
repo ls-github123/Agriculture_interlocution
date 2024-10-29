@@ -6,19 +6,12 @@
 </template>
 
 <script setup>
-const clientId = '671a02c6ef4cdd625a133fcd';
-const redirectUri = 'http://localhost:5173/dashboard'
+import { redirectToAuthing } from '../utils/authing'; // 导入封装的登录逻辑
 
+// 调用封装的登录函数
 const login = () => {
-    const authUrl = 
-        `https://agricultureinterlocution.authing.cn/oidc/auth` +
-        `?client_id=${clientId}` +
-        `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-        `&response_type=code` +
-        `&scope=openid profile email`;
-
-    console.log("跳转 URL:", authUrl);  // 打印 URL 以便调试
-    window.location.href = authUrl;  // 跳转到 Authing 登录页面
+    console.log('开始跳转到 Authing 登录页');
+    redirectToAuthing(); // 调用封装的跳转函数
 };
 </script>
 

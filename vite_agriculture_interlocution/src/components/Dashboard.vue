@@ -11,57 +11,58 @@
   
 <script setup>
 import { ref, onMounted } from 'vue';
+import { getAuthorizationCode, fetchAndStoreTokens, getAccessToken, isTokenExpired, refreshAccessToken, logoutAndRedirect } from '../utils/authing';
 import apiClient from '../utils/axios';
 
-// 初始化响应数据和错误消息状态
-const userInfo = ref('');
+const userInfo = ref(null);
 const errorMessage = ref('');
-const accessToken =  ref(localStorage.getItem('access_token') || '');
+const accessToken = ref(null);
+const loading = ref(false); // 添加 loading 状态
 
-// 加载页面时执行的逻辑
+// onMounted -- Vue 3 中的 生命周期钩子
+// 在组件第一次挂载时执行
 onMounted(async () => {
-  if (!accessToken.value) {
-    // 如果没有本地存储的令牌，则从URL中尝试获取授权码
-    const code = new URLSearchParams(window.location.search).get('code');
+  try {
+    const code = getAuthorizationCode(); // URL 中提取授权码 code
+    loading.value = true; // 开始加载
+
     if (code) {
-      try {
-        const response = await apiClient.post('/user/token/', { code });
-        userInfo.value = JSON.stringify(response.data.user_info, null, 2);
-        accessToken.value = response.data.access_token;
-        localStorage.setItem('access_token', response.data.access_token);
-        console.log('用户信息已获取并保存.');
-      } catch (error) {
-        console.error('获取用户信息失败:', error);
-      }
+      await fetchAndStoreTokens(code); // 使用授权码code从后端获取令牌
+      // 从内存或 sessionStorage 中获取 access_token
+    } else if (!getAccessToken() || isTokenExpired(getAccessToken())) {
+      await refreshAccessToken(); // 使用 refresh_token 向服务器请求新的 access_token
     } else {
-      errorMessage.value = '未检测到授权码, 请重新登录!';
+      await fetchUserInfo(); // 使用有效令牌请求用户信息
     }
-  } else {
-    // 如果本地有令牌, 则使用它获取用户信息
-    await fetchUserInfo();
+
+    await fetchUserInfo(); // 获取用户信息
+  } catch (error) {
+    errorMessage.value = error.message || '操作失败，请重新登录';
+    console.error(error);
+  } finally {
+    loading.value = false; // 加载结束
   }
 });
 
-// 使用令牌请求用户信息
-async function fetchUserInfo(){
+// 获取用户信息
+async function fetchUserInfo() {
   try {
-    const response = await apiClient.get('/user/info/', {
-      headers: { Authorization: `Bearer ${accessToken.value}` },
+    const token = getAccessToken();
+    accessToken.value = token; // 保存 access_token
+
+    const { data } = await apiClient.get('/user/user_info/', {
+      headers: { Authorization: `Bearer ${token}` },
     });
-    userInfo.value = JSON.stringify(response.data, null, 2);
+    userInfo.value = JSON.stringify(data, null, 2);
   } catch (error) {
-    console.error('用户信息获取失败:', error);
-    errorMessage.value = '用户信息获取失败,请重新登录。';
-    localStorage.removeItem('access_token');
+    errorMessage.value = '获取用户信息失败, 请重新登录';
+    console.error('获取用户信息失败:', error);
   }
 }
 
 // 退出登录
 function logout() {
-  localStorage.removeItem('access_token');
-  const logoutUrl = `https://agricultureinterlocution.authing.cn/oidc/session/end` +
-                    `?post_logout_redirect_uri=${encodeURIComponent(window.location.origin)}`;
-  window.location.href = logoutUrl;
+  logoutAndRedirect();
 }
 </script>
 

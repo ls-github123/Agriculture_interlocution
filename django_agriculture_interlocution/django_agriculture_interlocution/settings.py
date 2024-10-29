@@ -14,6 +14,8 @@ from pathlib import Path
 # python-decouple包, 导入本地.env配置信息(mysql数据库地址、密码、端口等),该信息不会被git同步
 from decouple import config
 import os
+from datetime import timedelta
+from tools.authing_token_utils import get_jwks_client # 导入获取JWKS公钥函数
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -62,9 +64,9 @@ MIDDLEWARE = [
 ]
 
 # 跨域请求设置
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',
-]
+# CORS_ALLOWED_ORIGINS = [
+#     'http://localhost:5173',
+# ]
 
 CORS_ALLOW_CREDENTIALS = True  # 允许发送 Cookie
 
@@ -200,9 +202,72 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+# 静态文件配置
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / 'static']
+
+# 媒体文件配置
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
+# 默认主键字段
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Django REST Framework 配置
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'tools.authentication.CustomJWTAuthentication',  # 自定义 JWT 认证类
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',  # 默认所有API视图访问均需通过认证
+    ),
+}
+
+# 配置 JWT Token 有效期和签发
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=3),  # Access Token 有效期 3 天
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),  # Refresh Token 有效期 30 天
+    'ROTATE_REFRESH_TOKENS': False,  # 刷新时是否重新签发 Token -- Authing 处理
+    'BLACKLIST_AFTER_ROTATION': False,  # 旧的 Refresh Token 是否失效 -- Authing 处理
+    'ALGORITHM': 'RS256',  # 使用 RS256 算法
+    'VERIFYING_KEY': get_jwks_client(), # 获取JWKS公钥
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+
+# 日志模块
+# 日志目录
+LOG_DIR = BASE_DIR.parent / 'logs'
+LOG_DIR.mkdir(exist_ok=True) # 确保日志目录存在(如果不存在，则自动创建)
+
+# 日志配置
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': str(LOG_DIR / 'django.log'),
+            'formatter': 'verbose',  # 使用详细日志格式
+        },
+    },
+    
+    'formatters': {
+        'verbose': {  # 详细格式
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',  # 使用 {} 样式的格式化
+        },
+    },
+    
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'INFO',  # 记录 INFO 及以上级别日志
+            'propagate': True,
+        },
+    },
+}

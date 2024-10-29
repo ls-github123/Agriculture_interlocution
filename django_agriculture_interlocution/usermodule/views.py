@@ -1,67 +1,80 @@
-from django.views.decorators.csrf import csrf_protect # 导入 csrf_protect
-from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from asgiref.sync import async_to_sync # 导入 async_to_sync
-from .authin_utils import get_token_from_authing, get_user_info
-import jwt
-import requests
-import httpx
+from tools.authing_token_utils import get_user_info, get_token_from_authing, refresh_Authing_token
+from rest_framework.exceptions import AuthenticationFailed
 
-@csrf_protect # 确保请求经过 CSRF 保护
-@api_view(['POST'])
-def exchange_token(request):
+class ExchangeToken(APIView):
     """
-    处理授权码并获取访问令牌和用户信息
+    使用授权码获取 Access Token 和 ID Token。
     """
-    code = request.data.get('code') # 从请求体中获取授权码
-    print(f"获取的授权码: {code}")
-    if not code:
-        return Response({'error': '缺少授权码'}, status=status.HTTP_400_BAD_REQUEST)
     
-    try:
-        # 使用 async_to_sync 包装异步调用
-        # 使用授权码从 Authing 获取访问令牌
-        token_data = async_to_sync(get_token_from_authing)(code)
-        # print(f"打印Token_data:{token_data}")
-        access_token = token_data.get('access_token') # 
-        id_token = token_data.get('id_token')
+    authentication_classes = []  # 禁用认证类，确保这个视图不需要令牌
+    permission_classes = []  # 禁用权限类
+    def post(self, request):
+        code = request.data.get('code')
+        if not code:
+            return Response({"error":"未获取到授权码"}, status=status.HTTP_400_BAD_REQUEST)
         
-        if not id_token:
-            return Response({'error': 'ID Token 不存在'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            tokens = async_to_sync(get_token_from_authing)(code) # 使用授权码获取令牌
+            print(f"令牌数据已获取")
+            return Response(tokens, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": f"获取令牌失败:{str(e)}"}, status=status.HTTP_401_UNAUTHORIZED)
+
+class UserInfoView(APIView):
+    """
+    使用 Access Token 获取用户信息。
+    """
+    authentication_classes = []  # 禁用认证类，确保这个视图不需要令牌
+    permission_classes = []  # 禁用权限类
+    
+    def get(self, request):
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            raise AuthenticationFailed("缺少或无有效的授权头!")
         
-        # 使用 async_to_sync 包装异步获取用户信息
-        user_info = async_to_sync(get_user_info)(access_token)
+        try:
+            token = auth_header.split()[1]
+            user_info = async_to_sync(get_user_info)(token) # 异步转换为同步调用
+            return Response(user_info, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": f"获取用户信息失败: {str(e)}"}, status=status.HTTP_401_UNAUTHORIZED)
+
+class RefreshTokenView(APIView):
+    """
+    接收 refresh_token, 并返回新的 access_token 和 id_token
+    """
+    def post(self, request):
+        refresh_token = request.data.get('refresh_token')
         
+        if not refresh_token:
+            return Response({"error": "缺少refresh_token"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            # 调用封装的 Authing 逻辑刷新令牌
+            tokens = async_to_sync(refresh_Authing_token)(refresh_token)
+            
+            return Response({
+                "access_token": tokens.get("access_token"),
+                "id_token": tokens.get("id_token"),
+                "expires_in": tokens.get("expires_in"),
+            }, status=status.HTTP_200_OK)
+        
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+    
+
+class JwtTestView(APIView):
+    """
+    测试JWT鉴权接口
+    """
+    permission_classes = [IsAuthenticated] # 确保只有认证用户可以访问
+    
+    def get(self, request):
         return Response({
-            'user_info': user_info,
-            'access_token': token_data.get('access_token'),
+            "message": "JWT认证成功!"
         }, status=status.HTTP_200_OK)
-    
-    except httpx.RequestError as e:
-        return Response({'error': f'网络请求失败: {str(e)}'}, status=status.HTTP_502_BAD_GATEWAY)
-
-    except jwt.ExpiredSignatureError:
-        return Response({'error': '令牌已过期'}, status=status.HTTP_401_UNAUTHORIZED)
-
-    except jwt.InvalidTokenError:
-        return Response({'error': '无效的令牌'}, status=status.HTTP_401_UNAUTHORIZED)
-
-    except Exception as e:
-        return Response({'error': f'未知错误: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
-@api_view(['GET'])
-def user_info(request):
-    authorization_header = request.headers.get('Authorization')
-    
-    if not authorization_header:
-        return Response({'error': '缺少访问令牌'}, status=status.HTTP_401_UNAUTHORIZED)
-    
-    try:
-        token = authorization_header.split()[1]
-        user_info = async_to_sync(get_user_info)(token)
-        
-        return Response(user_info, status=status.HTTP_200_OK)
-    
-    except Exception as e:
-        return Response({'error': f'未知错误: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
