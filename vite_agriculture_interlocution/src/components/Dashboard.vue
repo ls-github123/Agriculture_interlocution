@@ -1,62 +1,87 @@
 <template>
     <div class="dashboard">
       <h2>用户控制面板</h2>
+      <pre>{{ accessToken }}</pre>
       <button @click="logout">退出登录</button>
+      <p>用户信息:</p>
       <pre>{{ userInfo }}</pre>
+      <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
     </div>
   </template>
   
-  <script setup>
-  import { ref, onMounted } from 'vue';
-  import axios from 'axios';
-  
-  // 存储用户信息
-  const userInfo = ref(null);
-  
-  // 获取用户信息
-  const fetchUserInfo = async () => {
-    try {
-      const token = localStorage.getItem('access_token');
-      const response = await axios.get(
-        'https://agricultureinterlocution.authing.cn/oidc/me',
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      userInfo.value = response.data; // 保存用户信息
-    } catch (error) {
-      console.error('获取用户信息失败:', error);
+<script setup>
+import { ref, onMounted } from 'vue';
+import { getAuthorizationCode, fetchAndStoreTokens, getAccessToken, isTokenExpired, refreshAccessToken, logoutAndRedirect } from '../utils/authing';
+import apiClient from '../utils/axios';
+
+const userInfo = ref(null);
+const errorMessage = ref('');
+const accessToken = ref(null);
+const loading = ref(false); // 添加 loading 状态
+
+// onMounted -- Vue 3 中的 生命周期钩子
+// 在组件第一次挂载时执行
+onMounted(async () => {
+  try {
+    const code = getAuthorizationCode(); // URL 中提取授权码 code
+    loading.value = true; // 开始加载
+
+    if (code) {
+      await fetchAndStoreTokens(code); // 使用授权码code从后端获取令牌
+      // 从内存或 sessionStorage 中获取 access_token
+    } else if (!getAccessToken() || isTokenExpired(getAccessToken())) {
+      await refreshAccessToken(); // 使用 refresh_token 向服务器请求新的 access_token
+    } else {
+      await fetchUserInfo(); // 使用有效令牌请求用户信息
     }
-  };
-  
-  // Authing 配置
-  const AUTHING_CONFIG = {
-    appId: '671a02c6ef4cdd625a133fcd', // 替换为你的真实 App ID
-    logoutEndpoint: 'https://agricultureinterlocution.authing.cn/oidc/session/end', // 登出端点
-    postLogoutRedirectUri: 'http://localhost:5173/', // 登出后的重定向地址
-  };
-  
-  // 退出登录，清除本地 access_token，并重定向到 Authing 登出端点
-  const logout = () => {
-    localStorage.removeItem('access_token'); // 清除本地存储的 access_token
-  
-    // 构造 Authing 登出 URL
-    const logoutUrl = `${AUTHING_CONFIG.logoutEndpoint}` +
-      `?client_id=${AUTHING_CONFIG.appId}` +
-      `&post_logout_redirect_uri=${encodeURIComponent(AUTHING_CONFIG.postLogoutRedirectUri)}`;
-  
-    // 重定向到 Authing 托管的登出页
-    window.location.href = logoutUrl;
-  };
-  
-  // 在组件挂载时调用 fetchUserInfo
-  onMounted(fetchUserInfo);
-  </script>
-  
-  <style scoped>
-  .dashboard {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+
+    await fetchUserInfo(); // 获取用户信息
+  } catch (error) {
+    errorMessage.value = error.message || '操作失败，请重新登录';
+    console.error(error);
+  } finally {
+    loading.value = false; // 加载结束
   }
-  </style>  
+});
+
+// 获取用户信息
+async function fetchUserInfo() {
+  try {
+    const token = getAccessToken();
+    accessToken.value = token; // 保存 access_token
+
+    const { data } = await apiClient.get('/user/user_info/', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    userInfo.value = JSON.stringify(data, null, 2);
+  } catch (error) {
+    errorMessage.value = '获取用户信息失败, 请重新登录';
+    console.error('获取用户信息失败:', error);
+  }
+}
+
+// 退出登录
+function logout() {
+  logoutAndRedirect();
+}
+</script>
+
+<style scoped>
+.dashboard {
+  text-align: center;
+  margin-top: 50px;
+}
+
+pre {
+  background-color: #f4f4f4;
+  padding: 10px;
+  border-radius: 5px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.error {
+  color: red;
+  margin-top: 10px;
+}
+</style>  

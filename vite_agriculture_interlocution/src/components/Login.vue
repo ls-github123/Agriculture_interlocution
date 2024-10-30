@@ -1,35 +1,18 @@
 <template>
     <div class="login">
         <h2>P5实训-农业专家问答系统</h2>
-        <button @click="login">使用Authing登录</button>
+        <button @click="login">使用 Authing 登录</button>
     </div>
 </template>
 
 <script setup>
-import { redirectToAuthing, fetchAccessToken } from '../utils/authing'; //导入获取token的方法(即Authing登录集成配置)
-import { useRouter, useRoute } from 'vue-router';
-import { onMounted } from 'vue';
+import { redirectToAuthing } from '../utils/authing'; // 导入封装的登录逻辑
 
-const router = useRouter(); 
-const route = useRoute();
-
+// 调用封装的登录函数
 const login = () => {
-    redirectToAuthing(); // 跳转到Authing托管登录页
+    console.log('开始跳转到 Authing 登录页');
+    redirectToAuthing(); // 调用封装的跳转函数
 };
-
-// 在回调页解析授权码并请求 access_token
-onMounted(async () => {
-    const code = route.query.code;
-    if (code) {
-        try {
-            const token = await fetchAccessToken(code);
-            localStorage.setItem('access_token', token);
-            router.push('/dashboard'); // 跳转到控制面板
-        } catch (error) {
-            console.error('登录失败:', error);
-        }
-    }
-});
 </script>
 
 <style scoped>

@@ -5,7 +5,6 @@ import Dashboard from '../components/Dashboard.vue';
 const routes = [
     { path: '/', component: Login },
     { path: '/dashboard', component: Dashboard },
-    { path: '/callback', component: Login }, //回调页
 ];
 
 const router = createRouter({
