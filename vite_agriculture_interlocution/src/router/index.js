@@ -1,10 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
-import MessagesView from '../views/0-MessagesView.vue';
+import MessagesView from '../views/MessagesView.vue';
 
 
 import FeedbackForm from '../views/0-FeedbackForm.vue'; // 引入 FeedbackForm 组件
-import MessageDetail from '../views/2-MessageDetail.vue';
+import MessageDetail from '../views/MessageDetail.vue';
 
 import GoPage from '../views/GoPage.vue'
 
