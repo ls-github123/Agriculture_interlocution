@@ -43,6 +43,7 @@ def decode_jwt(token):
         audience=AUTHING_CONFIG['client_id'],
         options={"verify_exp": True}
     )
+    print(f"打印JWT解码后的令牌payload:{data}")
     return data
 
 async def get_token_from_authing(code: str) -> dict:
