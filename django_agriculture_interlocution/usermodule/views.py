@@ -29,20 +29,37 @@ class UserInfoView(APIView):
     """
     使用 Access Token 获取用户信息。
     """
-    authentication_classes = []  # 禁用认证类，确保这个视图不需要令牌
-    permission_classes = []  # 禁用权限类
+    permission_classes = [IsAuthenticated]
     
     def get(self, request):
-        auth_header = request.headers.get('Authorization')
-        if not auth_header or not auth_header.startswith('Bearer '):
-            raise AuthenticationFailed("缺少或无有效的授权头!")
+        user = request.user
+        profile = user.profile
         
-        try:
-            token = auth_header.split()[1]
-            user_info = async_to_sync(get_user_info)(token) # 异步转换为同步调用
-            return Response(user_info, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({"error": f"获取用户信息失败: {str(e)}"}, status=status.HTTP_401_UNAUTHORIZED)
+        data = {
+            'sub': user.sub,
+            'phone_number': user.phone_number,
+            'phone_number_verified': user.phone_number_verified,
+            'email': user.email,
+            'email_verified': user.email_verified,
+            'username': user.username,
+            'name': profile.name,
+            'given_name': profile.given_name,
+            'middle_name': profile.middle_name,
+            'family_name': profile.family_name,
+            'nickname': profile.nickname,
+            'preferred_username': profile.preferred_username,
+            'profile': profile.profile,
+            'picture': profile.picture,
+            'website': profile.website,
+            'birthdate': profile.birthdate,
+            'gender': profile.gender,
+            'zoneinfo': profile.zoneinfo,
+            'locale': profile.locale,
+            'updated_at': profile.updated_at.isoformat() if profile.updated_at else None
+        }
+        
+        return Response(data)
+
 
 class RefreshTokenView(APIView):
     """

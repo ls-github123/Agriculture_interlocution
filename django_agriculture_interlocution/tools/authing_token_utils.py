@@ -2,6 +2,7 @@
 # 令牌及用户信息获取
 import jwt
 from jwt import PyJWKClient
+import requests
 from decouple import config
 import httpx
 from cachetools import cached, TTLCache
@@ -29,29 +30,20 @@ def get_jwks_client() -> PyJWKClient:
     """
     return PyJWKClient(AUTHING_CONFIG['jwks_url'])
 
-def decode_jwt(token: str) -> dict:
+def decode_jwt(token):
     """
-    解码并验证 JWT (适用 ID Token 和 Access Token)。
+    解码并验证 JWT, 返回解码后的 payload。
     """
-    try:
-        # 从缓存中 获取 JWKS 客户端, 并获取签名密钥
-        jwks_client = get_jwks_client()
-        signing_key = jwks_client.get_signing_key_from_jwt(token)
-        
-        # 使用公钥解码并验证 JWT
-        decode_token = jwt.decode(
-            token,
-            signing_key.key, # 公钥
-            algorithms = ["RS256"], # 签名算法
-            audience = AUTHING_CONFIG['client_id'], # 校验受众
-            issuer = AUTHING_CONFIG['issuer'] # 校验颁发者
-        )
-        return decode_token
-    except jwt.ExpiredSignatureError:
-        raise Exception("Token 已过期！")
-    except jwt.InvalidTokenError as e:
-        raise Exception(f"Token 验证失败: {e}")
-
+    jwks_client = get_jwks_client()
+    signing_key = jwks_client.get_signing_key_from_jwt(token)
+    data = jwt.decode(
+        token,
+        key=signing_key.key,
+        algorithms=["RS256"],
+        audience=AUTHING_CONFIG['client_id'],
+        options={"verify_exp": True}
+    )
+    return data
 
 async def get_token_from_authing(code: str) -> dict:
     """

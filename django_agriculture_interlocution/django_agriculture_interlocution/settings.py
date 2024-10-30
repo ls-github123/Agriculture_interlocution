@@ -233,7 +233,7 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': False,  # 刷新时是否重新签发 Token -- Authing 处理
     'BLACKLIST_AFTER_ROTATION': False,  # 旧的 Refresh Token 是否失效 -- Authing 处理
     'ALGORITHM': 'RS256',  # 使用 RS256 算法
-    'VERIFYING_KEY': get_jwks_client(), # 获取JWKS公钥
+    'VERIFYING_KEY': '', # 获取JWKS公钥
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
