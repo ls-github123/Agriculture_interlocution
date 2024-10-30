@@ -22,7 +22,7 @@ const routes = [
     props: true  // 传递路由参数作为组件的props
   },
   {
-    path: '/message-detail/:messageId',
+    path: '/message/:type/:messageId',
     name: 'MessageDetail',
     component: MessageDetail,
   },

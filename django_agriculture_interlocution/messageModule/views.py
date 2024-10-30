@@ -5,7 +5,25 @@ from .serializers import *
 
 
 
+class ServiceNotificationDetail(generics.RetrieveAPIView):
+    queryset = ServiceNotification.objects.all()
+    serializer_class = ServiceNotificationSerializer
 
+class WeatherReminderDetail(generics.RetrieveAPIView):
+    queryset = WeatherReminder.objects.all()
+    serializer_class = WeatherReminderSerializer
+
+class PlantingMessageDetail(generics.RetrieveAPIView):
+    queryset = PlantingMessage.objects.all()
+    serializer_class = PlantingMessageSerializer
+
+class PraiseCommentMessageDetail(generics.RetrieveAPIView):
+    queryset = PraiseCommentMessage.objects.all()
+    serializer_class = PraiseCommentMessageSerializer
+
+class SystemNotificationDetail(generics.RetrieveAPIView):
+    queryset = SystemNotification.objects.all()
+    serializer_class = SystemNotificationSerializer
 
 
 

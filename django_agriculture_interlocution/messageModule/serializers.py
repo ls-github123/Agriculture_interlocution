@@ -2,6 +2,17 @@ from rest_framework import serializers
 from .models import *
 
 
+
+
+
+
+
+
+
+
+
+
+
 class ServiceNotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceNotification

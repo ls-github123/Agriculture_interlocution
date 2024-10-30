@@ -1,41 +1,73 @@
 <template>
   <div class="message-detail">
-    <van-nav-bar title="消息详情" left-text="返回" left-arrow @click-left="goBack">
-      <template #right>
-        <img src="/images/transparent-icon.gif" alt="Toggle Transparency" class="toggle-icon" @click="toggleTransparency" />
-      </template>
-    </van-nav-bar>
-
+    <van-nav-bar :title="pageTitle" left-text="返回" left-arrow @click-left="goBack" />
     <div class="message-container">
-      <header class="message-header" :style="{ backgroundColor: isTransparent ? 'transparent' : 'rgba(255, 255, 255, 1)' }">
-        <h1 class="message-title">{{ message.title }}</h1>
-        <time class="message-time">{{ message.send_time_formatted }}</time>
-      </header>
-      <div class="message-content-wrapper" :style="{ backgroundColor: isTransparent ? 'transparent' : 'rgba(255, 255, 255, 1)' }">
-        <p class="message-content">{{ message.content }}</p>
+      <div class="message-header">
+        <span class="message-title">{{ message.title }}</span>
+        <span class="message-time">{{ message.sent_at_formatted }}</span>
       </div>
-      <footer class="message-type">
-        <van-tag type="warning">{{ message.type_id?.type_name || '未知类型' }}</van-tag>
-      </footer>
+      <div class="message-content">
+        {{ message.content }}
+      </div>
+      <div class="message-status">
+        状态: {{ getMessageStatusText(message.status) }}
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, onMounted, computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { Toast } from 'vant';
 import axios from 'axios';
 
 export default {
   setup() {
     const route = useRoute();
+    const router = useRouter();
     const message = ref({});
-    const isTransparent = ref(false); // 默认不透明
 
-    const fetchMessage = async () => {
+    const pageTitle = computed(() => {
+      switch (route.query.type) {
+        case 'service':
+          return '服务通知详情';
+        case 'weather':
+          return '气象提醒详情';
+        case 'planting':
+          return '种植消息详情';
+        case 'like-comment':
+          return '赞评消息详情';
+        case 'system':
+          return '系统通知详情';
+        default:
+          return '消息详情';
+      }
+    });
+
+    const fetchMessageDetail = async () => {
       try {
-        const response = await axios.get(`http://127.0.0.1:8000/messageModule/messages/${route.params.messageId}/`);
+        let url = '';
+        switch (route.query.type) {
+          case 'service':
+            url = `http://127.0.0.1:8000/messageModule/service-messages/${route.params.messageId}/`;
+            break;
+          case 'weather':
+            url = `http://127.0.0.1:8000/messageModule/weather-reminders/${route.params.messageId}/`;
+            break;
+          case 'planting':
+            url = `http://127.0.0.1:8000/messageModule/planting-messages/${route.params.messageId}/`;
+            break;
+          case 'like-comment':
+            url = `http://127.0.0.1:8000/messageModule/praise-comment-messages/${route.params.messageId}/`;
+            break;
+          case 'system':
+            url = `http://127.0.0.1:8000/messageModule/system-notifications/${route.params.messageId}/`;
+            break;
+          default:
+            return;
+        }
+        const response = await axios.get(url);
         message.value = response.data;
       } catch (error) {
         Toast('加载消息详情失败');
@@ -43,57 +75,60 @@ export default {
       }
     };
 
+    const getMessageStatusText = (status) => {
+      switch (status) {
+        case 'unread':
+          return '未读';
+        case 'read':
+          return '已读';
+        case 'deleted':
+          return '已删除';
+        default:
+          return '未知状态';
+      }
+    };
+
     onMounted(() => {
-      fetchMessage();
+      fetchMessageDetail();
     });
 
     const goBack = () => {
-      window.history.back();
-    };
-
-    const toggleTransparency = () => {
-      isTransparent.value = !isTransparent.value;
+      router.back();
     };
 
     return {
       message,
+      pageTitle,
       goBack,
-      isTransparent,
-      toggleTransparency,
+      getMessageStatusText
     };
   },
 };
 </script>
 
 <style scoped>
-:root {
-  --primary-color: #333;
-  --secondary-color: #666;
-  --background-color: #fff;
-  --border-radius: 8px;
-  --padding: 16px;
+.message-detail {
+  background-color: #f0f2f5; /* 浅灰色背景 */
+  height: 100vh;
+  padding: 0 10px;
+  display: flex;
+  flex-direction: column;
 }
 
-.message-detail {
-  padding: var(--padding);
-  background-image: url('/images/144.jpg'); /* 确保图片路径正确 */
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed; /* 背景图片固定 */
-  position: relative; /* 为遮罩层设置相对定位 */
-  overflow: hidden; /* 防止内容溢出 */
-  min-height: 100vh; /* 确保页面高度至少为视口高度 */
+.van-nav-bar {
+  background-color: hwb(166 61% 3% / 0.718);
+  color: white;
+  border-radius: 20px; /* 圆角边框 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
+  overflow: hidden;
 }
 
 .message-container {
-  position: relative; /* 使内容位于遮罩层之上 */
-  z-index: 2;
-  background-color: var(--background-color);
-  border-radius: var(--border-radius);
+  background-color: white;
+  border-radius: 8px;
+  margin-top: 10px;
+  padding: 16px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: var(--padding);
-  margin-bottom: 20px;
 }
 
 .message-header {
@@ -101,41 +136,27 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
-  transition: background-color 0.3s; /* 平滑过渡效果 */
 }
 
 .message-title {
   font-size: 18px;
   font-weight: bold;
-  color: var(--primary-color);
 }
 
 .message-time {
   font-size: 14px;
-  color: var(--secondary-color);
-}
-
-.message-content-wrapper {
-  padding: var(--padding);
-  border-radius: var(--border-radius);
-  margin-bottom: 8px;
-  transition: background-color 0.3s; /* 平滑过渡效果 */
+  color: #666;
 }
 
 .message-content {
   font-size: 16px;
-  color: var(--primary-color);
-  white-space: pre-line; /* 保留换行符 */
-}
-
-.message-type {
+  color: #333;
   margin-bottom: 8px;
 }
 
-.toggle-icon {
-  cursor: pointer;
-  width: 24px;
-  height: 24px;
+.message-status {
+  font-size: 14px;
+  color: #999;
 }
 </style>
 
