@@ -1,17 +1,24 @@
 <template>
   <div class="message-detail">
-    <van-nav-bar :title="pageTitle" left-text="返回" left-arrow @click-left="goBack" />
+    <!-- 导航栏 -->
+    <van-nav-bar :title="pageTitle" left-text="返回" left-arrow @click-left="goBack">
+      <template #right>
+        <img src="/images/transparent-icon.gif" alt="Toggle Transparency" class="toggle-icon" @click="toggleTransparency" />
+      </template>
+    </van-nav-bar>
+
+    <!-- 消息容器 -->
     <div class="message-container">
-      <div class="message-header">
-        <span class="message-title">{{ message.title }}</span>
-        <span class="message-time">{{ message.sent_at_formatted }}</span>
+      <header class="message-header" :style="{ backgroundColor: isTransparent ? 'transparent' : 'rgba(255, 255, 255, 1)' }">
+        <h1 class="message-title">{{ message.title }}</h1>
+        <time class="message-time">{{ message.sent_at_formatted }}</time>
+      </header>
+      <div class="message-content-wrapper" :style="{ backgroundColor: isTransparent ? 'transparent' : 'rgba(255, 255, 255, 1)' }">
+        <p class="message-content">{{ message.content }}</p>
       </div>
-      <div class="message-content">
-        {{ message.content }}
-      </div>
-      <div class="message-status">
-        状态: {{ getMessageStatusText(message.status) }}
-      </div>
+      <footer class="message-status">
+        <van-tag type="warning">{{ getMessageStatusText(message.status) }}</van-tag>
+      </footer>
     </div>
   </div>
 </template>
@@ -27,7 +34,9 @@ export default {
     const route = useRoute();
     const router = useRouter();
     const message = ref({});
+    const isTransparent = ref(false); // 默认不透明
 
+    // 计算属性：根据路由参数设置页面标题
     const pageTitle = computed(() => {
       switch (route.query.type) {
         case 'service':
@@ -45,6 +54,7 @@ export default {
       }
     });
 
+    // 获取消息详细信息
     const fetchMessageDetail = async () => {
       try {
         let url = '';
@@ -68,13 +78,22 @@ export default {
             return;
         }
         const response = await axios.get(url);
-        message.value = response.data;
+        const data = response.data;
+
+        // 处理时间格式
+        if (data.sent_at) {
+          const date = new Date(data.sent_at);
+          data.sent_at_formatted = `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 ${date.getHours()}:${date.getMinutes()}`;
+        }
+
+        message.value = data;
       } catch (error) {
         Toast('加载消息详情失败');
         console.error('Error fetching message detail:', error);
       }
     };
 
+    // 获取消息状态的文本描述
     const getMessageStatusText = (status) => {
       switch (status) {
         case 'unread':
@@ -88,159 +107,28 @@ export default {
       }
     };
 
+    // 页面加载时获取消息详细信息
     onMounted(() => {
       fetchMessageDetail();
     });
 
+    // 返回上一页
     const goBack = () => {
       router.back();
     };
 
-    return {
-      message,
-      pageTitle,
-      goBack,
-      getMessageStatusText
-    };
-  },
-};
-</script>
-
-<style scoped>
-.message-detail {
-  background-color: #f0f2f5; /* 浅灰色背景 */
-  height: 100vh;
-  padding: 0 10px;
-  display: flex;
-  flex-direction: column;
-}
-
-.van-nav-bar {
-  background-color: hwb(166 61% 3% / 0.718);
-  color: white;
-  border-radius: 20px; /* 圆角边框 */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
-  overflow: hidden;
-}
-
-.message-container {
-  background-color: white;
-  border-radius: 8px;
-  margin-top: 10px;
-  padding: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.message-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.message-title {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.message-time {
-  font-size: 14px;
-  color: #666;
-}
-
-.message-content {
-  font-size: 16px;
-  color: #333;
-  margin-bottom: 8px;
-}
-
-.message-status {
-  font-size: 14px;
-  color: #999;
-}
-</style>
-
-
-<!-- <template>
-  <div class="message-detail">
-    <van-nav-bar title="消息详情" left-text="返回" left-arrow @click-left="goBack">
-      <template #right>
-        <img src="/images/transparent-icon.gif" alt="Toggle Transparency" class="toggle-icon" @click="toggleTransparency" />
-      </template>
-    </van-nav-bar>
-
-    <div class="message-container">
-      <header class="message-header" :style="{ backgroundColor: isTransparent ? 'transparent' : 'rgba(255, 255, 255, 1)' }">
-        <h1 class="message-title">{{ message.title }}</h1>
-        <time class="message-time">{{ message.send_time_formatted }}</time>
-      </header>
-      <div class="message-content-wrapper" :style="{ backgroundColor: isTransparent ? 'transparent' : 'rgba(255, 255, 255, 1)' }">
-        <p class="message-content">{{ message.content }}</p>
-      </div>
-      <footer class="message-type">
-        <van-tag type="warning">{{ message.type_id?.type_name || '未知类型' }}</van-tag>
-      </footer>
-    </div>
-  </div>
-</template>
-
-<script>
-import { ref, onMounted, computed } from 'vue';
-import { useRoute } from 'vue-router';
-import { Toast } from 'vant';
-import axios from 'axios';
-
-export default {
-  setup() {
-    const route = useRoute();
-    const message = ref({});
-    const isTransparent = ref(false); // 默认不透明
-
-    const fetchMessage = async () => {
-      try {
-        const messageId = route.params.messageId;
-        const messageType = route.query.type; // 获取消息类型
-        let url = '';
-
-        switch (messageType) {
-          case 'planting':
-            url = `http://127.0.0.1:8000/messageModule/planting-messages/${messageId}/`;
-            break;
-          case 'like-comment':
-            url = `http://127.0.0.1:8000/messageModule/like-comment-messages/${messageId}/`;
-            break;
-          case 'system':
-            url = `http://127.0.0.1:8000/messageModule/system-notifications/${messageId}/`;
-            break;
-          default:
-            throw new Error('Unknown message type');
-        }
-
-        const response = await axios.get(url);
-        message.value = response.data;
-      } catch (error) {
-        Toast('加载消息详情失败');
-        console.error('Error fetching message detail:', error);
-      }
-    };
-
-    onMounted(() => {
-      fetchMessage();
-    });
-
-    const goBack = () => {
-      window.history.back();
-    };
-
+    // 切换背景透明度
     const toggleTransparency = () => {
       isTransparent.value = !isTransparent.value;
     };
 
     return {
       message,
+      pageTitle,
       goBack,
+      getMessageStatusText,
       isTransparent,
-      toggleTransparency,
+      toggleTransparency
     };
   },
 };
@@ -269,6 +157,14 @@ export default {
   overflow: hidden; /* 防止内容溢出 */
 }
 
+.van-nav-bar {
+  background: linear-gradient(to right, #3a6073, #ffffff); /* 左右渐变色 */
+  color: white;
+  border-radius: 20px; /* 圆角边框 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
+  overflow: hidden;
+}
+
 .message-container {
   flex: 1; /* 使内容容器占据剩余空间 */
   display: flex;
@@ -283,8 +179,8 @@ export default {
 
 .message-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column; /* 垂直排列 */
+  align-items: center; /* 水平居中 */
   margin-bottom: 8px;
   transition: background-color 0.3s; /* 平滑过渡效果 */
 }
@@ -293,11 +189,16 @@ export default {
   font-size: 18px;
   font-weight: bold;
   color: var(--primary-color);
+  text-align: center; /* 标题居中 */
+  margin: 0; /* 移除默认的上下外边距 */
 }
 
 .message-time {
   font-size: 14px;
   color: var(--secondary-color);
+  text-align: center; /* 时间居中 */
+  margin-top: 4px; /* 与标题的间距 */
+  margin-bottom: 8px; /* 与内容的间距 */
 }
 
 .message-content-wrapper {
@@ -313,10 +214,12 @@ export default {
   font-size: 16px;
   color: var(--primary-color);
   white-space: pre-line; /* 保留换行符 */
+  text-align: center; /* 内容居中 */
 }
 
-.message-type {
+.message-status {
   margin-bottom: 8px;
+  text-align: center; /* 状态居中 */
 }
 
 .toggle-icon {
@@ -324,4 +227,4 @@ export default {
   width: 24px;
   height: 24px;
 }
-</style> -->
+</style>
