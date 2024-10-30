@@ -84,7 +84,7 @@ WSGI_APPLICATION = 'django_agriculture_interlocution.wsgi.application'
 DATABASES = {
     'default': { # config 从.env文件中读取mysql机密配置信息
         "ENGINE":"django.db.backends.mysql", # 使用nei的 MySQL 引擎
-        "NAME": config('DB_NAME'), # 数据库名称
+        "NAME": 'p5_message', # 数据库名称
         "USER": config('DB_USER'), # 数据库用户
         "PASSWORD": config('DB_PASSWORD'), # 数据库密码
         "HOST": config('DB_HOST', default='localhost'), # 数据库主机地址
