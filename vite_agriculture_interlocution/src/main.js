@@ -2,7 +2,7 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
 import 'vant/lib/index.css'; // 引入 Vant 样式
-import { Button, Cell, CellGroup, Icon, NavBar, Toast, Tag } from 'vant';
+import { Button, Cell, CellGroup, Icon, NavBar,Tab, Tabs, Toast, Tag } from 'vant';
 
 // 引入 Font Awesome
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -19,7 +19,9 @@ app.use(Button);
 app.use(Cell);
 app.use(CellGroup);
 app.use(Icon);
-app.use(NavBar); // 修正这里，将 NabBar 改为 NavBar
+app.use(NavBar); 
+app.use(Tab);
+app.use(Tabs);
 app.use(Toast);
 app.use(Tag);
 

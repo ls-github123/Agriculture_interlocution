@@ -1,25 +1,62 @@
-from django.http import JsonResponse
-from rest_framework.decorators import api_view
+from rest_framework import generics, status
 from rest_framework.response import Response
-from rest_framework import status
-from .models import Message
-from .serializers import MessageSerializer
+from .models import *
+from .serializers import *
 
-@api_view(['GET'])
-def message_list(request):
-    if request.method == 'GET':
-        messages = Message.objects.all()
-        serializer = MessageSerializer(messages, many=True)
-        return Response(serializer.data)
-    
 
-@api_view(['GET'])
-def message_detail(request, message_id):
-    try:
-        message = Message.objects.get(message_id=message_id)
-    except Message.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
 
-    if request.method == 'GET':
-        serializer = MessageSerializer(message)
-        return Response(serializer.data)
+
+
+
+
+
+
+
+
+
+
+
+class ServiceNotificationList(generics.ListAPIView):
+    queryset = ServiceNotification.objects.all()
+    serializer_class = ServiceNotificationSerializer
+
+class WeatherReminderList(generics.ListAPIView):
+    queryset = WeatherReminder.objects.all()
+    serializer_class = WeatherReminderSerializer
+
+class PlantingMessageList(generics.ListAPIView):
+    queryset = PlantingMessage.objects.all()
+    serializer_class = PlantingMessageSerializer
+
+class PraiseCommentMessageList(generics.ListAPIView):
+    queryset = PraiseCommentMessage.objects.all()
+    serializer_class = PraiseCommentMessageSerializer
+
+class SystemNotificationList(generics.ListAPIView):
+    queryset = SystemNotification.objects.all()
+    serializer_class = SystemNotificationSerializer
+
+class MarkAsReadView(generics.GenericAPIView):
+    def post(self, request, *args, **kwargs):
+        message_id = request.data.get('message_id')
+        message_type = request.data.get('type')
+
+        if message_type == 'service':
+            message = ServiceNotification.objects.filter(id=message_id).first()
+        elif message_type == 'weather':
+            message = WeatherReminder.objects.filter(id=message_id).first()
+        elif message_type == 'planting':
+            message = PlantingMessage.objects.filter(id=message_id).first()
+        elif message_type == 'like-comment':
+            message = PraiseCommentMessage.objects.filter(id=message_id).first()
+        elif message_type == 'system':
+            message = SystemNotification.objects.filter(id=message_id).first()
+        else:
+            return Response({"error": "Invalid message type"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if message:
+            message.status = 'read'
+            message.save()
+            return Response({"status": "success", "message": "Message marked as read"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Message not found"}, status=status.HTTP_404_NOT_FOUND)

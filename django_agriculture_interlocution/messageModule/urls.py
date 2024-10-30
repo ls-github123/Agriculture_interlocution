@@ -1,9 +1,13 @@
 from django.urls import path
-from .views import message_list,message_detail
+from .views import *
 
 urlpatterns = [
-    path('messages/', message_list, name='message_list'),
-    path('messages/<int:message_id>/', message_detail, name='message_detail'),
+    path('service-messages/', ServiceNotificationList.as_view(), name='service-messages-list'),
+    path('weather-reminders/', WeatherReminderList.as_view(), name='weather-reminders-list'),
+    path('planting-messages/', PlantingMessageList.as_view(), name='planting-messages-list'),
+    path('praise-comment-messages/', PraiseCommentMessageList.as_view(), name='praise-comment-messages-list'),
+    path('system-notifications/', SystemNotificationList.as_view(), name='system-notifications-list'),
+    path('mark-as-read/', MarkAsReadView.as_view(), name='mark-as-read'),
+
+   
 ]
-
-
