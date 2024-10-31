@@ -35,16 +35,18 @@ def decode_jwt(token):
     解码并验证 JWT, 返回解码后的 payload。
     """
     jwks_client = get_jwks_client()
+    # JWKS 客户端根据传入的 JWT，找到用于签名的 公钥
     signing_key = jwks_client.get_signing_key_from_jwt(token)
     data = jwt.decode(
-        token,
-        key=signing_key.key,
-        algorithms=["RS256"],
+        token, # 传入的 JWT 字符串
+        key=signing_key.key, # 使用从 JWKS 中找到的公钥来解码和验证 JWT 签名
+        algorithms=["RS256"], # 指定支持的加密算法
+        # 确保令牌的 aud(audience，接收方) 字段与应用的 client_id 匹配 (防止令牌被错误的应用使用)
         audience=AUTHING_CONFIG['client_id'],
-        options={"verify_exp": True}
+        options={"verify_exp": True} # 开启对令牌过期时间的验证(exp 过期时间字段)
     )
-    print(f"打印JWT解码后的令牌payload:{data}")
-    return data
+    # print(f"打印JWT解码后的令牌payload:{data}")
+    return data # 将解码后的 payload 返回给调用者
 
 async def get_token_from_authing(code: str) -> dict:
     """

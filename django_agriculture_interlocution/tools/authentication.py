@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from tools.authing_token_utils import get_user_info
 from asgiref.sync import async_to_sync # 导入 async_to_sync
 from usermodule.models import UserProfile
+from django.db import transaction
 
 User = get_user_model()
 
@@ -36,47 +37,48 @@ class CustomJWTAuthentication(BaseAuthentication):
             user = User.objects.get(sub=sub)
             return (user, None)
         except User.DoesNotExist:
-            # 从 Authing 获取用户详细信息
-            user_info = async_to_sync(get_user_info)(token)
-            if not user_info:
-                raise AuthenticationFailed('无法从 Authing 获取用户信息。')
+            # 使用事务确保用户信息和用户资料都写入本地数据库
+            with transaction.atomic():
+                # 从 Authing 获取用户详细信息
+                user_info = async_to_sync(get_user_info)(token)
+                if not user_info:
+                    raise AuthenticationFailed('无法从 Authing 获取用户信息。')
+                
+                # 检查用户信息中是否包含手机号
+                phone_number = user_info.get('phone_number')
+                if not phone_number:
+                    raise AuthenticationFailed('用户信息中缺少手机号(phone_number)。')
 
-            phone_number = user_info.get('phone_number')
-            if not phone_number:
-                raise AuthenticationFailed('用户信息中缺少手机号（phone_number）。')
-
-            # 创建用户
-            user = User.objects.create_user(
-                sub=sub,
-                phone_number=phone_number,
-                phone_number_verified=user_info.get('phone_number_verified', False),
-                email=user_info.get('email'),
-                email_verified=user_info.get('email_verified', False),
-                username=user_info.get('username'),
-                is_active=True,
-                is_staff=False
-            )
+                # 创建用户
+                user = User.objects.create_user(
+                    sub=sub,
+                    phone_number=phone_number,
+                    phone_number_verified=user_info.get('phone_number_verified', False),
+                    email=user_info.get('email'),
+                    email_verified=user_info.get('email_verified', False),
+                    username=user_info.get('username'),
+                    is_active=True,
+                    is_staff=False
+                )
+                
+                # 创建用户资料
+                profile_data = {
+                    'name': user_info.get('name'),
+                    'given_name': user_info.get('given_name'),
+                    'middle_name': user_info.get('middle_name'),
+                    'family_name': user_info.get('family_name'),
+                    'nickname': user_info.get('nickname'),
+                    'preferred_username': user_info.get('preferred_username'),
+                    'profile': user_info.get('profile'),
+                    'picture': user_info.get('picture'),
+                    'website': user_info.get('website'),
+                    'birthdate': user_info.get('birthdate'),
+                    'gender': user_info.get('gender'),
+                    'zoneinfo': user_info.get('zoneinfo'),
+                    'locale': user_info.get('locale'),
+                    'updated_at': user_info.get('updated_at')
+                }
+                UserProfile.objects.create(user=user, **profile_data)
             
-            # 创建用户资料
-            profile_data = {
-                'name': user_info.get('name'),
-                'given_name': user_info.get('given_name'),
-                'middle_name': user_info.get('middle_name'),
-                'family_name': user_info.get('family_name'),
-                'nickname': user_info.get('nickname'),
-                'preferred_username': user_info.get('preferred_username'),
-                'profile': user_info.get('profile'),
-                'picture': user_info.get('picture'),
-                'website': user_info.get('website'),
-                'birthdate': user_info.get('birthdate'),
-                'gender': user_info.get('gender'),
-                'zoneinfo': user_info.get('zoneinfo'),
-                'locale': user_info.get('locale'),
-                'updated_at': user_info.get('updated_at')
-            }
-            UserProfile.objects.create(
-                user=user,
-                **profile_data
-            )
-
-        return (user, None)
+            # 返回用户对象 确保前端能获取到用户信息
+            return (user, None)
