@@ -2,6 +2,46 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from .models import *
 from .serializers import *
+from rest_framework.pagination import PageNumberPagination
+
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 5  # 每页显示的数量
+    page_size_query_param = 'page_size'  # 允许客户端通过查询参数控制每页显示的数量
+    max_page_size = 100  # 每页显示的最大数量
+
+
+
+# 服务通知列表视图
+class ServiceNotificationList(generics.ListAPIView):
+    queryset = ServiceNotification.objects.all()
+    serializer_class = ServiceNotificationSerializer
+    pagination_class = StandardResultsSetPagination  # 使用自定义分页类
+
+# 天气提醒列表视图
+class WeatherReminderList(generics.ListAPIView):
+    queryset = WeatherReminder.objects.all()
+    serializer_class = WeatherReminderSerializer
+    pagination_class = StandardResultsSetPagination  # 使用自定义分页类
+
+# 种植信息列表视图
+class PlantingMessageList(generics.ListAPIView):
+    queryset = PlantingMessage.objects.all()
+    serializer_class = PlantingMessageSerializer
+    pagination_class = StandardResultsSetPagination  # 使用自定义分页类
+
+# 赞评论信息列表视图
+class PraiseCommentMessageList(generics.ListAPIView):
+    queryset = PraiseCommentMessage.objects.all()
+    serializer_class = PraiseCommentMessageSerializer
+    pagination_class = StandardResultsSetPagination  # 使用自定义分页类
+
+# 系统通知列表视图
+class SystemNotificationList(generics.ListAPIView):
+    queryset = SystemNotification.objects.all()
+    serializer_class = SystemNotificationSerializer
+    pagination_class = StandardResultsSetPagination  # 使用自定义分页类
+
+
 
 # 服务通知详情视图
 class ServiceNotificationDetail(generics.RetrieveAPIView):
@@ -30,30 +70,7 @@ class SystemNotificationDetail(generics.RetrieveAPIView):
     queryset = SystemNotification.objects.all()
     serializer_class = SystemNotificationSerializer
 
-# 服务通知列表视图
-class ServiceNotificationList(generics.ListAPIView):
-    queryset = ServiceNotification.objects.all()
-    serializer_class = ServiceNotificationSerializer
 
-# 天气提醒列表视图
-class WeatherReminderList(generics.ListAPIView):
-    queryset = WeatherReminder.objects.all()
-    serializer_class = WeatherReminderSerializer
-
-# 种植信息列表视图
-class PlantingMessageList(generics.ListAPIView):
-    queryset = PlantingMessage.objects.all()
-    serializer_class = PlantingMessageSerializer
-
-# 赞评论信息列表视图
-class PraiseCommentMessageList(generics.ListAPIView):
-    queryset = PraiseCommentMessage.objects.all()
-    serializer_class = PraiseCommentMessageSerializer
-
-# 系统通知列表视图
-class SystemNotificationList(generics.ListAPIView):
-    queryset = SystemNotification.objects.all()
-    serializer_class = SystemNotificationSerializer
 
 # 标记消息已读视图
 class MarkAsReadView(generics.GenericAPIView):
