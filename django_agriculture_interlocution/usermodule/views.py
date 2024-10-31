@@ -4,9 +4,9 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from asgiref.sync import async_to_sync # 导入 async_to_sync
 from tools.authing_token_utils import get_user_info, get_token_from_authing, refresh_Authing_token, decode_jwt
-from rest_framework.exceptions import AuthenticationFailed
+from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
-from usermodule.models import UserProfile
+from usermodule.models import UserProfile, UsersModel
 
 class ExchangeToken(APIView):
     """
@@ -36,7 +36,12 @@ class UserInfoView(APIView):
     permission_classes = [IsAuthenticated] # 确保只有认证用户可以访问
     
     def get(self, request):
-        user = request.user
+        # 从 request.user 获取用户唯一标识符 sub
+        # 直接从自定义认证类中获取解码的令牌载荷 sub 信息
+        user_sub = request.user.sub
+        
+        # 从数据库获取用户实例
+        user_instance = get_object_or_404(UsersModel, sub=user_sub)
 
         # 从请求头中获取 access_token
         auth_header = request.headers.get('Authorization')
@@ -52,15 +57,15 @@ class UserInfoView(APIView):
             return Response({'detail': f'获取用户信息失败：{str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         if user_info:
-            # 更新用户信息
-            user.phone_number = user_info.get('phone_number', user.phone_number)
-            user.phone_number_verified = user_info.get('phone_number_verified', user.phone_number_verified)
-            user.email = user_info.get('email', user.email)
-            user.email_verified = user_info.get('email_verified', user.email_verified)
-            user.username = user_info.get('username', user.username)
-            user.save()
+            # 更新用户实例的主要信息
+            user_instance.phone_number = user_info.get('phone_number', user_instance.phone_number)
+            user_instance.phone_number_verified = user_info.get('phone_number_verified', user_instance.phone_number_verified)
+            user_instance.email = user_info.get('email', user_instance.email)
+            user_instance.email_verified = user_info.get('email_verified', user_instance.email_verified)
+            user_instance.username = user_info.get('username', user_instance.username)
+            user_instance.save()
 
-            # 更新用户资料
+            # 更新用户的扩展资料
             profile_data = {
                 'name': user_info.get('name'),
                 'given_name': user_info.get('given_name'),
@@ -79,21 +84,22 @@ class UserInfoView(APIView):
             }
 
             UserProfile.objects.update_or_create(
-                user=user,
-                defaults=profile_data
+                user = user_instance,
+                defaults = profile_data
             )
 
         # 准备返回数据
-        profile = getattr(user, 'profile', None)
+        profile = getattr(user_instance, 'profile', None)
         data = {
-            'sub': user.sub,
-            'phone_number': user.phone_number,
-            'phone_number_verified': user.phone_number_verified,
-            'email': user.email,
-            'email_verified': user.email_verified,
-            'username': user.username,
+            'sub': user_instance.sub,
+            'phone_number': user_instance.phone_number,
+            'phone_number_verified': user_instance.phone_number_verified,
+            'email': user_instance.email,
+            'email_verified': user_instance.email_verified,
+            'username': user_instance.username,
         }
 
+        # 如果用户有扩展资料，将其附加到响应数据
         if profile:
             data.update({
                 'name': profile.name,
@@ -136,7 +142,7 @@ class RefreshTokenView(APIView):
         
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_401_UNAUTHORIZED)
-    
+
 
 class JwtTestView(APIView):
     """
@@ -145,6 +151,14 @@ class JwtTestView(APIView):
     permission_classes = [IsAuthenticated] # 确保只有认证用户可以访问
     
     def get(self, request):
+        # 直接使用 request.user.sub 获取用户令牌载荷的 sub 信息
+        user_sub = request.user.sub
+        print(user_sub, type(user_sub))
+        
+        # request_user_sub = request.user
+        # print(request_user_sub, type(request_user_sub))
+        
         return Response({
-            "message": "JWT认证成功!"
+            "message": "JWT认证成功!",
+            'sub': f'用户sub为:{user_sub}'
         }, status=status.HTTP_200_OK)
