@@ -22,19 +22,20 @@ class CustomJWTAuthentication(BaseAuthentication):
             return None # 返回 None，DRF处理未认证的情况
         
         token = auth_header.split(' ')[1]
-        
+
         try:
             decode_token = decode_jwt(token)
         except Exception as e:
             raise AuthenticationFailed(f"令牌验证失败: {str(e)}")
         
-        sub = decode_token.get("sub")
-        if not sub:
+        user_sub = decode_token.get("sub")
+        if not user_sub:
             raise AuthenticationFailed('令牌中缺少用户标识符(sub)!')
-        
+
         # 尝试获取用户
         try:
-            user = User.objects.get(sub=sub)
+            user = User.objects.get(sub=user_sub)
+            user.sub = user_sub  # 将 sub 信息作为用户对象的一个属性
             return (user, None)
         except User.DoesNotExist:
             # 使用事务确保用户信息和用户资料都写入本地数据库
@@ -51,7 +52,7 @@ class CustomJWTAuthentication(BaseAuthentication):
 
                 # 创建用户
                 user = User.objects.create_user(
-                    sub=sub,
+                    sub=user_sub,
                     phone_number=phone_number,
                     phone_number_verified=user_info.get('phone_number_verified', False),
                     email=user_info.get('email'),
