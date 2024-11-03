@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'corsheaders', # 跨域配置
     'rest_framework', # DRF支持
     'usermodule', # 子应用-用户模块
-    'messageModule' # 子应用-消息模块
+    'messageModule', # 子应用-消息模块
+    'essearch',
 ]
 
 MIDDLEWARE = [

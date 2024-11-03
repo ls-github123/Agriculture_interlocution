@@ -3,6 +3,7 @@
     <div class="content">
       <h1>欢迎来到主页</h1>
       <van-button type="primary" to="/messages">消息</van-button>
+      <van-button type="primary" to="/search-data">搜索</van-button>
     </div>
   </div>
 </template>
