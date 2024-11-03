@@ -6,7 +6,10 @@ from asgiref.sync import async_to_sync # 导入 async_to_sync
 from tools.authing_token_utils import get_user_info, get_token_from_authing, refresh_Authing_token, decode_jwt
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
-from usermodule.models import UserProfile, UsersModel
+from usermodule.models import UserProfile, UsersModel, UserVerification
+from .real_identity_verify import check_id_card # 身份证实名认证封装
+from decouple import config
+import re
 
 class ExchangeToken(APIView):
     """
@@ -97,6 +100,7 @@ class UserInfoView(APIView):
             'email': user_instance.email,
             'email_verified': user_instance.email_verified,
             'username': user_instance.username,
+            'is_verified': user_instance.is_verified  # 仅返回，不修改
         }
 
         # 如果用户有扩展资料，将其附加到响应数据
@@ -142,6 +146,82 @@ class RefreshTokenView(APIView):
         
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+
+class VerifyIdCardView(APIView):
+    """
+    身份证二要素(姓名+身份证号)实名认证接口。
+    """
+    permission_classes = [IsAuthenticated] # 确保只有认证用户可访问
+    
+    def post(self, request):
+        # 直接从 request.user 获取用户 sub 信息
+        user_sub = request.user.sub
+        
+        # 获取请求数据
+        name = request.data.get('name')
+        idcard = request.data.get('idcard')
+        appcode = config('VERIFY_IDCARD_APPCODE') # 接口AppCode
+        
+        # 验证必填字段
+        if not name or not idcard:
+            return Response({'error': '用户姓名和身份证号不能为空!'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # 正则校验输入信息
+        # 姓名校验 中文字符 长度1-20
+        name_pattern = r'^[\u4e00-\u9fa5]{1,20}$'
+        # 身份证号校验: 18位纯数字或17位数字加X/x
+        idcard_pattern = r'^\d{17}[\dXx]$'
+        
+        if not re.match(name_pattern, name):
+            return Response({'error': '输入的用户姓名无效!'}, status=status.HTTP_400_BAD_REQUEST)
+        if not re.match(idcard_pattern, idcard):
+            return Response({'error': '输入的身份证号格式无效!'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # 调用异步 check_id_card 函数 转换为同步调用
+        try:
+            result = async_to_sync(check_id_card)(name, idcard, appcode)
+        except Exception as e:
+            return Response({'error': f'验证身份证信息失败: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+        # 解析结果并处理
+        if result and result.get('success') and result.get('code') == 200:
+            data = result.get('data', {})
+            
+            # 检查验证结果(0表示一致， 1表示不一致)
+            if data.get('result') == 0:
+                # 验证成功, 更新用户信息
+                user_instance = get_object_or_404(UsersModel, sub=user_sub)
+                user_instance.is_verified = True
+                user_instance.save()
+                
+                # 保存用户实名信息
+                UserVerification.objects.update_or_create(
+                    user = user_instance,
+                    defaults = {
+                        'real_name':name,
+                        'id_card_number': idcard
+                    }
+                )
+                
+                # 准备成功响应数据
+                return Response({
+                    'msg': '身份验证成功',
+                    'user_data': {
+                        'birthday': data.get('birthday'),
+                        'address': data.get('address'),
+                        'sex': data.get('sex'),
+                        'order_no': data.get('orderNo')
+                    }
+                }, status=status.HTTP_200_OK)
+            else:
+                # 验证不一致
+                return Response({
+                    'msg': '身份验证失败!',
+                    'description': data.get('desc', '不一致')
+                }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # 如果返回的 success 为 False 或 code 不是 200
+        return Response({'error': '用户身份信息验证失败!'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class JwtTestView(APIView):
