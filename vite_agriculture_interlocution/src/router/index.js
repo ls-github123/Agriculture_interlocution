@@ -10,7 +10,7 @@ import GoPage from '../views/GoPage.vue'
 
 
 
-import AddData from '../views/AddData.vue';
+
 import SearchData from '../views/SearchData.vue';
 
 const routes = [
@@ -18,11 +18,6 @@ const routes = [
     path: '/',
     name: 'home',
     component: HomeView,
-  },
-  {
-    path: '/add-data',
-    name: 'AddData',
-    component: AddData
   },
   {
     path: '/search-data',
