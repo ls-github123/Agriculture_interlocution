@@ -6,7 +6,9 @@
     <!-- 搜索按钮触发 search 方法 -->
     <button @click="search">搜索</button>
     <!-- 如果正在加载数据，则显示加载中提示 -->
-    <div v-if="loading" class="loading">加载中...</div>
+    <div v-if="loading" class="loading">
+      <img src="/images/loading.gif" alt="Loading..." /> <!-- 动态加载图标 -->
+    </div>
     <!-- 如果数据加载完成，则显示结果 -->
     <div v-else>
       <!-- 循环渲染搜索结果 -->
@@ -39,6 +41,8 @@ export default {
       searchQuery: '', // 用户输入的搜索词
       results: [], // 存储搜索结果的数据数组
       loading: false, // 加载状态标志
+      loadingStartedAt: null, // 加载开始时间
+      minLoadingTime: 500, // 最小加载时间（毫秒）
       currentPage: 1, // 当前页面编号
       pageSize: 4, // 每页显示的结果数量
       totalPages: 1 // 总页数
@@ -48,6 +52,7 @@ export default {
     // 发起搜索请求的方法
     async search() {
       this.loading = true; // 设置加载状态为true
+      this.loadingStartedAt = new Date().getTime(); // 记录加载开始时间
       try {
         // 发送GET请求到后端API获取搜索结果
         const response = await axios.get('http://127.0.0.1:8000/essearch/search/', {
@@ -61,8 +66,16 @@ export default {
         this.totalPages = Math.ceil(response.data.total / this.pageSize); // 计算总页数
       } catch (error) {
         console.error('搜索失败:', error); // 捕获并打印错误信息
-      } finally {
-        this.loading = false; // 无论成功或失败，最终都结束加载状态
+      }
+      // 计算已加载的时间
+      const elapsed = new Date().getTime() - this.loadingStartedAt;
+      // 如果加载时间小于最小加载时间，则等待剩余时间后再结束加载状态
+      if (elapsed < this.minLoadingTime) {
+        setTimeout(() => {
+          this.loading = false;
+        }, this.minLoadingTime - elapsed);
+      } else {
+        this.loading = false; // 结束加载状态
       }
     },
     // 跳转到上一页的方法
@@ -84,26 +97,43 @@ export default {
 </script>
 
 <!-- 样式部分 -->
-<style>
+<style scoped>
 .search-container {
   margin: 50px auto; /* 容器居中 */
-  width: 600px; /* 固定宽度 */
+  width: 700px; /* 调整宽度 */
+  padding: 20px; /* 添加内边距 */
+  background-color: #fff; /* 背景颜色 */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
+  border-radius: 8px; /* 圆角 */
   text-align: center; /* 文本居中 */
 }
 
 input {
-  padding: 10px; /* 内边距 */
+  padding: 12px; /* 增加内边距 */
   width: 70%; /* 宽度占70% */
   margin-right: 10px; /* 右外边距 */
+  border: 1px solid #ced4da; /* 边框颜色 */
+  border-radius: 4px; /* 圆角 */
+  font-size: 14px; /* 字体大小 */
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; /* 平滑过渡 */
+}
+
+input:focus {
+  border-color: #80bdff; /* 聚焦时边框颜色 */
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* 聚焦时阴影效果 */
+  outline: none; /* 去掉默认轮廓线 */
 }
 
 button {
-  padding: 10px 20px; /* 内边距 */
+  padding: 12px 24px; /* 增加内边距 */
   background-color: #007bff; /* 背景颜色 */
-  color: white; /* 文字颜色 */
+  color: #fff; /* 文字颜色 */
   border: none; /* 移除边框 */
   cursor: pointer; /* 鼠标悬停时指针变为手型 */
   margin: 5px; /* 外边距 */
+  border-radius: 4px; /* 圆角 */
+  font-size: 14px; /* 字体大小 */
+  transition: background-color 0.15s ease-in-out; /* 平滑过渡 */
 }
 
 button:hover {
@@ -111,7 +141,7 @@ button:hover {
 }
 
 button:disabled {
-  background-color: #cccccc; /* 按钮禁用时背景颜色 */
+  background-color: #6c757d; /* 按钮禁用时背景颜色 */
   cursor: not-allowed; /* 鼠标悬停时指针变为禁止符号 */
 }
 
@@ -121,17 +151,29 @@ button:disabled {
   color: #6c757d; /* 字体颜色 */
 }
 
+.loading img {
+  width: 160px; /* 图像宽度 */
+  height: 160px; /* 图像高度 */
+}
+
 .result-item {
-  border: 1px solid #ccc; /* 边框 */
-  padding: 10px; /* 内边距 */
-  margin: 10px 0; /* 上下外边距 */
-  border-radius: 5px; /* 圆角 */
+  border: 1px solid #e2e6ea; /* 边框颜色 */
+  padding: 15px; /* 增加内边距 */
+  margin: 15px 0; /* 上下外边距 */
+  border-radius: 8px; /* 圆角 */
   background-color: #f8f9fa; /* 背景颜色 */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
+  transition: box-shadow 0.2s ease-in-out; /* 平滑过渡 */
+}
+
+.result-item:hover {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16); /* 鼠标悬停时阴影效果 */
 }
 
 .result-item h3 {
   margin: 0; /* 去除默认上下外边距 */
   font-size: 18px; /* 字体大小 */
+  color: #343a40; /* 字体颜色 */
 }
 
 .result-item p {
@@ -142,5 +184,13 @@ button:disabled {
 
 .pagination {
   margin-top: 20px; /* 上方外边距 */
+  display: flex; /* 使用弹性布局 */
+  justify-content: space-between; /* 按钮之间留有空间 */
+  align-items: center; /* 垂直居中 */
+}
+
+.pagination span {
+  font-size: 16px; /* 字体大小 */
+  color: #343a40; /* 字体颜色 */
 }
 </style>
