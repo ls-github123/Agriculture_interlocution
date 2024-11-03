@@ -7,6 +7,8 @@ from tools.authing_token_utils import get_user_info, get_token_from_authing, ref
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from usermodule.models import UserProfile, UsersModel
+from .real_identity_verify import check_id_card # 身份证实名认证封装
+from decouple import config
 
 class ExchangeToken(APIView):
     """
@@ -142,6 +144,32 @@ class RefreshTokenView(APIView):
         
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+
+class VerifyIdCardView(APIView):
+    """
+    身份证二要素(姓名+身份证号)实名认证接口。
+    """
+    permission_classes = [AllowAny] # 确保只有认证用户可访问
+    
+    def post(self, request):
+        # 获取请求数据
+        name = request.data.get('name')
+        idcard = request.data.get('idcard')
+        appcode = config('VERIFY_IDCARD_APPCODE') # 接口AppCode
+        
+        # 验证必填字段
+        if not name or not idcard:
+            return Response({'error': 'Name and ID card are required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # 调用异步 check_id_card 函数 转换为同步调用
+        result = async_to_sync(check_id_card)(name, idcard, appcode)
+        
+        # 返回结果
+        if result:
+            return Response(result, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Failed to verify ID card information'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
 
 
 class JwtTestView(APIView):
