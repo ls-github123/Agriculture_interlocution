@@ -11,6 +11,7 @@
           <li><a href="#">Farming Practices</a></li>
           <li><a href="#">News</a></li>
           <li><a href="#">Contact</a></li>
+          <li><router-link to="/login">Login</router-link></li>
         </ul>
         <div class="icons">
           <i class="fas fa-search"></i>

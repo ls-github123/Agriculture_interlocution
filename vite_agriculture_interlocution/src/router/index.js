@@ -5,6 +5,7 @@ import Dashboard from '../components/Dashboard.vue';
 
 const routes = [
     { path: '/', component: Home },
+    { path: '/login', component: Login }, // 添加login路由
     { path: '/dashboard', component: Dashboard },
 ];
 
