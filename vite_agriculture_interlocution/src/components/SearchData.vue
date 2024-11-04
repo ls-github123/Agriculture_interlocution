@@ -1,6 +1,7 @@
 <template>
   <!-- 搜索容器 -->
   <div class="search-container">
+    <h1>科普农业大全</h1>
     <!-- 输入框绑定到 searchQuery 数据属性 -->
     <input type="text" v-model="searchQuery" placeholder="输入搜索内容..." />
     <!-- 搜索按钮触发 search 方法 -->

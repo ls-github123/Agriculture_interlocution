@@ -5,7 +5,7 @@
         <div class="logo">FARM<span>TECH</span></div>
         <ul class="nav-links">
           <li><a href="#">首页</a></li>
-          <li><a href="#">科普</a></li>
+          <li><router-link to="/SearchData">科普</router-link></li>
           <li><a href="#">服务</a></li>
           <li><a href="#">我们的产品</a></li>
           <li><a href="#">农业行情</a></li>
