@@ -8,9 +8,9 @@
     <button @click="search">搜索</button>
     <!-- 如果正在加载数据，则显示加载中提示 -->
     <div v-if="loading" class="loading">
-      <img src="/images/loading.gif" alt="Loading..." /> <!-- 动态加载图标 -->
+      <img :src="jiazai" alt="Loading..." /> <!-- 显示加载中的图片 -->
     </div>
-    <!-- 如果数据加载完成，则显示结果 -->
+    <!-- 如果数据加载完成，则显示结果  -->
     <div v-else>
       <!-- 循环渲染搜索结果 -->
       <div v-for="(item, index) in results" :key="index" class="result-item">
@@ -35,8 +35,17 @@
 
 <script>
 import axios from 'axios'; // 导入axios用于发送HTTP请求
+import blobConfig from '../config/blobConfig';
+
+
 
 export default {
+  name: 'loading',
+  computed: {
+    jiazai() {
+      return `${blobConfig.baseBlobUrl}/gif/loading.gif`;
+      }
+    },
   data() {
     return {
       searchQuery: '', // 用户输入的搜索词
