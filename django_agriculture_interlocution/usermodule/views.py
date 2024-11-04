@@ -100,7 +100,7 @@ class UserInfoView(APIView):
             'email': user_instance.email,
             'email_verified': user_instance.email_verified,
             'username': user_instance.username,
-            'is_verified': user_instance.is_verified  # 仅返回，不修改
+            'is_verified': user_instance.is_verified  # 用户是否实名 仅返回，不修改
         }
 
         # 如果用户有扩展资料，将其附加到响应数据
