@@ -1,7 +1,6 @@
 # 身份证实名认证接口封装
 import httpx
 import ssl
-from decouple import config
 
 # APPCODE调用方法
 async def check_id_card(name, idcard, appcode):
