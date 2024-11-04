@@ -5,6 +5,7 @@
         <div class="logo">FARM<span>TECH</span></div>
         <ul class="nav-links">
           <li><a href="#">Home</a></li>
+          <li><router-link to="/SearchData">知识</router-link></li>
           <li><a href="#">About</a></li>
           <li><a href="#">Services</a></li>
           <li><a href="#">Products</a></li>
