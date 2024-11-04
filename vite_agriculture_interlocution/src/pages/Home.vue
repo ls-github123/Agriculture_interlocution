@@ -4,14 +4,13 @@
       <nav class="navbar">
         <div class="logo">FARM<span>TECH</span></div>
         <ul class="nav-links">
-          <li><a href="#">Home</a></li>
-          <li><a href="#">About</a></li>
-          <li><a href="#">Services</a></li>
-          <li><a href="#">Products</a></li>
-          <li><a href="#">Farming Practices</a></li>
-          <li><a href="#">News</a></li>
-          <li><a href="#">Contact</a></li>
-          <li><router-link to="/login">Login</router-link></li>
+          <li><a href="#">首页</a></li>
+          <li><a href="#">科普</a></li>
+          <li><a href="#">服务</a></li>
+          <li><a href="#">我们的产品</a></li>
+          <li><a href="#">农业行情</a></li>
+          <li><a href="#">联系我们</a></li>
+          <li><router-link to="/login">登录</router-link></li>
         </ul>
         <div class="icons">
           <i class="fas fa-search"></i>
