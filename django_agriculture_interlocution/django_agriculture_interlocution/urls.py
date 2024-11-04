@@ -20,4 +20,5 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/', include('usermodule.urls')), # 子应用-用户模块
+    path('essearch/', include('essearch.urls')), # 子应用-问题模块
 ]
