@@ -30,6 +30,7 @@
         </div>
       </section>
   
+
       <!-- Hero Area End -->
       <section>
         <img :src="d2" alt="展示图片" style="width: 90%; height: auto; margin-top: 100px;margin-bottom: 30px;"/>
@@ -141,7 +142,7 @@ export default {
     名称：getText,navigateToPage 
      */
     getText(index) {
-      const texts = ['最佳服务', '农场体验', '100%天然', '农用设备', '社区讨论'];
+      const texts = ['最佳服务', '农场管理', '100%天然', '农用设备', '社区讨论'];
       return texts[index];
     },
     navigateToPage(index) {
