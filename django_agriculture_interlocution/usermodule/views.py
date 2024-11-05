@@ -13,7 +13,7 @@ import re
 
 class ExchangeToken(APIView):
     """
-    使用授权码获取 Access Token \ ID Token \ Refresh Token。
+    使用授权码获取 Access Token - ID Token - Refresh Token。
     """
     authentication_classes = []  # 禁用认证类，确保这个视图不需要令牌
     permission_classes = []  # 禁用权限类

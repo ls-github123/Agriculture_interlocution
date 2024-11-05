@@ -1,12 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Home from '../pages/Home.vue';
-import Login from '../components/Login.vue';
-import Dashboard from '../components/Dashboard.vue';
+
+const Home = () => import('../pages/Home.vue');
 
 const routes = [
-    { path: '/', component: Home },
-    { path: '/login', component: Login }, // 添加login路由
-    { path: '/dashboard', component: Dashboard },
+    { path: '/home', name: 'Home', component: Home },
 ];
 
 const router = createRouter({
