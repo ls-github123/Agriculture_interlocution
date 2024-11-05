@@ -1,182 +1,142 @@
 <template>
-    <div class="homepage">
-      <!-- Navbar -->
-      <nav class="navbar">
-        <div class="logo">FARM<span>TECH</span></div>
-        <ul class="nav-links">
-          <li><a href="#">首页</a></li>
-          <li><router-link to="/SearchData">科普</router-link></li>
-          <li><a href="#">服务</a></li>
-          <li><a href="#">我们的产品</a></li>
-          <li><a href="#">农业行情</a></li>
-          <li><a href="#">联系我们</a></li>
-          <li><router-link to="/login">登录</router-link></li>
-        </ul>
-        <div class="icons">
-          <i class="fas fa-search"></i>
-          <i class="fas fa-shopping-cart"></i>
+  <div class="homepage">
+    <nav class="navbar">
+      <div class="logo">FARM<span>TECH</span></div>
+      <ul class="nav-links">
+        <li><a href="#">首页</a></li>
+        <li><router-link to="/SearchData">科普</router-link></li>
+        <li><a href="#">服务</a></li>
+        <li><a href="#">我们的产品</a></li>
+        <li><a href="#">农业行情</a></li>
+        <li><a href="#">联系我们</a></li>
+        <li><router-link to="/login">登录</router-link></li>
+      </ul>
+      <div class="icons">
+        <i class="fas fa-search"></i>
+        <i class="fas fa-shopping-cart"></i>
+      </div>
+    </nav>
+    <section class="hero" :style="{ backgroundImage: `url(${currentImage})` }">
+      <div class="hero-content">
+        <h1>The Future of Agriculture Starts Here</h1>
+        <p>
+          Discover how our innovative solutions are transforming the agriculture industry. 
+          From cutting-edge technology to sustainable practices, we're paving the way for the future.
+        </p>
+        <button class="cta-button" @click="navigateToPage(0)">Learn More</button>
+      </div>
+    </section>
+    <section>
+      <img :src="d2" alt="展示图片" style="width: 90%; height: auto; margin-top: 100px;margin-bottom: 30px;"/>
+      <ul class="HAE-image-list">
+        <li v-for="(image, index) in d2_1" :key="index" class="image-item" @click="navigateToPage(index)">
+          <img :src="image" alt="展示图片" />
+          <p>{{ getText(index) }}</p>
+        </li>
+      </ul>
+    </section>
+    <section class="FBAE-about-section">
+      <div class="FBAE-text-content">
+        <p>Let Us Tell You Our Story</p>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam nunc elit, pretium atlanta urna veloci,
+          fermentum malesuada mina. Donec auctor nislec neque sagittis, sit amet dapibus pellentesque donal feugiat.
+          Nulla mollis magna non sanaliquet, volutpat do zutum, ultrices consectetur, ultrices at purus.
+        </p>
+      </div>
+      <div class="image-content">
+        <img src="#" alt="描述性文字" />
+      </div>
+    </section>
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-section about">
+          <h2>About Us</h2>
+          <p>FARMTECH is dedicated to advancing agriculture through innovative solutions and sustainable practices.</p>
         </div>
-      </nav>
-  
-      <!-- Hero Section -->
-      <section class="hero" :style="{ backgroundImage: `url(${currentImage})` }">
-        <div class="hero-content">
-          <h1>The Future of Agriculture Starts Here</h1>
-          <p>
-            Discover how our innovative solutions are transforming the agriculture industry. 
-            From cutting-edge technology to sustainable practices, we're paving the way for the future.
-          </p>
-          <button class="cta-button">Learn More</button>
+        <div class="footer-section links">
+          <h2>Quick Links</h2>
+          <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Services</a></li>
+            <li><a href="#">Products</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
         </div>
-      </section>
-  
-
-      <!-- Hero Area End -->
-      <section>
-        <img :src="d2" alt="展示图片" style="width: 90%; height: auto; margin-top: 100px;margin-bottom: 30px;"/>
-        <ul class="HAE-image-list">
-          <li v-for="(image, index) in d2_1" :key="index" class="image-item" @click="navigateToPage(index)">
-            <img :src="image" alt="展示图片" />
-            <p>{{ getText(index) }}</p>
-          </li>
-        </ul>
-      </section>
-      
-
-      <!-- Famie Benefits Area End  -->
-      <section class="FBAE-about-section">
-        <div class="FBAE-text-content">
-          <p>Let Us Tell You Our Story</p>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam nunc elit, pretium atlanta urna veloci,
-            fermentum malesuada mina. Donec auctor nislec neque sagittis, sit amet dapibus pellentesque donal feugiat.
-            Nulla mollis magna non sanaliquet, volutpat do zutum, ultrices consectetur, ultrices at purus.
-          </p>
+        <div class="footer-section contact">
+          <h2>Contact Us</h2>
+          <p><i class="fas fa-phone"></i> +123 456 789</p>
+          <p><i class="fas fa-envelope"></i> info@farmtech.com</p>
+          <p><i class="fas fa-map-marker-alt"></i> 123 Agriculture St., City, Country</p>
         </div>
-        <div class="image-content">
-          <img src="#" alt="描述性文字" />
-        </div>
-      </section>
-
-
-
-
-      <!-- Footer Section -->
-      <footer class="footer">
-        <div class="footer-content">
-          <div class="footer-section about">
-            <h2>About Us</h2>
-            <p>FARMTECH is dedicated to advancing agriculture through innovative solutions and sustainable practices.</p>
-          </div>
-          <div class="footer-section links">
-            <h2>Quick Links</h2>
-            <ul>
-              <li><a href="#">Home</a></li>
-              <li><a href="#">About</a></li>
-              <li><a href="#">Services</a></li>
-              <li><a href="#">Products</a></li>
-              <li><a href="#">Contact</a></li>
-            </ul>
-          </div>
-          <div class="footer-section contact">
-            <h2>Contact Us</h2>
-            <p><i class="fas fa-phone"></i> +123 456 789</p>
-            <p><i class="fas fa-envelope"></i> info@farmtech.com</p>
-            <p><i class="fas fa-map-marker-alt"></i> 123 Agriculture St., City, Country</p>
-          </div>
-          <div class="footer-section social">
-            <h2>Follow Us</h2>
-            <div class="social-icons">
-              <i class="fab fa-facebook-f"></i>
-              <i class="fab fa-twitter"></i>
-              <i class="fab fa-instagram"></i>
-              <i class="fab fa-linkedin-in"></i>
-            </div>
+        <div class="footer-section social">
+          <h2>Follow Us</h2>
+          <div class="social-icons">
+            <i class="fab fa-facebook-f"></i>
+            <i class="fab fa-twitter"></i>
+            <i class="fab fa-instagram"></i>
+            <i class="fab fa-linkedin-in"></i>
           </div>
         </div>
-        <div class="footer-bottom">
-          <p>&copy; 2024 FARMTECH | Designed by YourCompany</p>
-        </div>
-      </footer>
-    </div>
-  </template>
-  
-<script>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 FARMTECH | Designed by YourCompany</p>
+      </div>
+    </footer>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import blobConfig from '../config/blobConfig';
 
-export default {
-  name: "carousel-container",
-  data() {
-    return {
-      images: [
-        `${blobConfig.baseBlobUrl}/bg-img/1.jpg`,
-        `${blobConfig.baseBlobUrl}/bg-img/3.jpg`,
-        `${blobConfig.baseBlobUrl}/bg-img/6.jpg`,
-        `${blobConfig.baseBlobUrl}/bg-img/7.jpg`,
-        `${blobConfig.baseBlobUrl}/bg-img/8.jpg`,
-      ],
-      d2:[
-        `${blobConfig.baseBlobUrl}/bg-img/2.jpg`,
-        // 
-      ],
-      d2_1:[
-        `${blobConfig.baseBlobUrl}/gif/digger.gif`,
-        `${blobConfig.baseBlobUrl}/gif/windmill.gif`,
-        `${blobConfig.baseBlobUrl}/gif/cereals.gif`,
-        `${blobConfig.baseBlobUrl}/gif/tractor.gif`,
-        `${blobConfig.baseBlobUrl}/gif/discuss.gif`,
-      ],
-      currentIndex: 0,
-      interval: null
-    };
-  },
-  computed: {
-    currentImage() {
-      return this.images[this.currentIndex];
-    }
-  },
+const images = [
+  `${blobConfig.baseBlobUrl}/bg-img/1.jpg`,
+  `${blobConfig.baseBlobUrl}/bg-img/3.jpg`,
+  `${blobConfig.baseBlobUrl}/bg-img/6.jpg`,
+  `${blobConfig.baseBlobUrl}/bg-img/7.jpg`,
+  `${blobConfig.baseBlobUrl}/bg-img/8.jpg`,
+];
+const d2 = `${blobConfig.baseBlobUrl}/bg-img/2.jpg`;
+const d2_1 = [
+  `${blobConfig.baseBlobUrl}/gif/digger.gif`,
+  `${blobConfig.baseBlobUrl}/gif/windmill.gif`,
+  `${blobConfig.baseBlobUrl}/gif/cereals.gif`,
+  `${blobConfig.baseBlobUrl}/gif/tractor.gif`,
+  `${blobConfig.baseBlobUrl}/gif/discuss.gif`,
+];
+const currentIndex = ref(0);
+const interval = ref(null);
 
-  methods: {
-    /* 
-    Hero Section 里面的功能
-    名称：getText,navigateToPage 
-     */
-    getText(index) {
-      const texts = ['最佳服务', '农场管理', '100%天然', '农用设备', '社区讨论'];
-      return texts[index];
-    },
-    navigateToPage(index) {
-      const pages = ['/service', '/farm-experience', '/natural-products', '/agricultural-equipment', '/organic-food'];
-      window.location.href = pages[index];
-    },
+const currentImage = computed(() => images[currentIndex.value]);
 
-
-    /* 
-     nextImage，prevImage
-     Hero Area End 里面的轮播图功能
-    */
-    nextImage() {
-      this.currentIndex = (this.currentIndex + 1) % this.images.length;
-    },
-    prevImage() {
-      this.currentIndex = (this.currentIndex - 1 + this.images.length) % this.images.length;
-    }
-  },
-
-
-  /* 
-   mounted，beforeDestroy
-   Hero Area End 里面的轮播图功能
-   */
-  mounted() {
-    this.interval = setInterval(this.nextImage, 3000); // 每3秒切换一次图片
-  },
-  beforeDestroy() {
-    clearInterval(this.interval); // 清理定时器
-  }
+const getText = (index) => {
+  const texts = ['最佳服务', '农场管理', '100%天然', '农用设备', '社区讨论'];
+  return texts[index];
 };
 
-  </script>
+const navigateToPage = (index) => {
+  const pages = ['/service', '/farm-experience', '/natural-products', '/agricultural-equipment', '/organic-food'];
+  window.location.href = pages[index];
+};
+
+const nextImage = () => {
+  currentIndex.value = (currentIndex.value + 1) % images.length;
+};
+
+const prevImage = () => {
+  currentIndex.value = (currentIndex.value - 1 + images.length) % images.length;
+};
+
+onMounted(() => {
+  interval.value = setInterval(nextImage, 3000); // 每3秒切换一次图片
+});
+
+onUnmounted(() => {
+  clearInterval(interval.value); // 清理定时器
+});
+</script>
   
   <style scoped>
   /* Navbar Styles */
