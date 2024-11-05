@@ -126,8 +126,9 @@ class UserInfoView(APIView):
 
 class RefreshTokenView(APIView):
     """
-    接收 refresh_token, 并返回新的 access_token 和 id_token
+    接收 refresh_token, 并返回新的 access_token 、 id_token 及 refresh_token
     """
+    permission_classes = [AllowAny] # 任何用户均可访问
     def post(self, request):
         refresh_token = request.data.get('refresh_token')
         
@@ -141,6 +142,7 @@ class RefreshTokenView(APIView):
             return Response({
                 "access_token": tokens.get("access_token"),
                 "id_token": tokens.get("id_token"),
+                "refresh_token": tokens.get('refresh_token'),
                 "expires_in": tokens.get("expires_in"),
             }, status=status.HTTP_200_OK)
         

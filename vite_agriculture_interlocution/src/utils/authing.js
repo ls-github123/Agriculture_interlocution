@@ -45,7 +45,7 @@ export function isTokenExpired(token) {
     try {
         // 检查令牌的格式是否正确
         const parts = token.split('.');
-       if (parts.length !== 3) throw new Error('无效的JWT格式');
+        if (parts.length !== 3) throw new Error('无效的JWT格式');
         // Base64 解码 payload 部分，并解析为 JSON 对象
         const payload = JSON.parse(atob(parts[1]));
         if (!payload.exp) throw new Error('缺少 exp 字段');
@@ -58,7 +58,7 @@ export function isTokenExpired(token) {
     }
 }
 
-// 获取 refresh_token
+// 获取存储在 cookie 中的 refresh_token
 export function getRefreshToken() {
     const match = document.cookie.match(/(^| )refresh_token=([^;]+)/);
     const token = match ? match[2] : null;
@@ -70,18 +70,18 @@ export function getRefreshToken() {
 export async function refreshAccessToken() {
     const refreshToken = getRefreshToken();
     if (!refreshToken) {
-        console.error('缺少 refresh_token, 请重新登录');
-        // logoutAndRedirect();
-        return;
+        console.error('缺少 refresh_token, 无法刷新令牌');
+        return false;
     }
     try {
+        // 向后端发送请求, 使用 refresh_token 获取新的令牌
         const { data } = await apiClient.post('/user/refresh_token/', { refresh_token: refreshToken });
-        storeTokens(data.access_token, data.id_token, refreshToken);
+        // 存储新的令牌, 包括新的 refresh_token
+        storeTokens(data.access_token, data.id_token, data.refresh_token);
+        return true;
     } catch (error) {
         console.error('刷新令牌失败:', error);
-        if (error.response?.status === 401) {
-            // logoutAndRedirect();
-        }
+        return false;
     }
 }
 
@@ -89,7 +89,9 @@ export async function refreshAccessToken() {
 export function storeTokens(accessToken, idToken, refreshToken) {
     storeAccessToken(accessToken);
     storeIdToken(idToken);
-    storeRefreshToken(refreshToken);
+    if (refreshToken) {
+        storeRefreshToken(refreshToken);
+    }
     console.log('成功存储令牌');
 }
 
@@ -98,7 +100,7 @@ function storeAccessToken(token) {
     sessionStorage.setItem('access_token', token);
 }
 
-// 存储 ID Token 到 sessionStorage中
+// 存储 ID Token 到 sessionStorage
 function storeIdToken(token) {
     sessionStorage.setItem('id_token', token);
 }
@@ -106,13 +108,17 @@ function storeIdToken(token) {
 // 存储 Refresh Token 到 HttpOnly Cookie 中
 function storeRefreshToken(token) {
     console.log("存储 refresh_token:", token);
-    document.cookie = `refresh_token=${token}; Max-Age=2592000; Path=/; Secure; SameSite=Lax`;
+    // 注意：由于需要在前端读取 refresh_token，无法设置 HttpOnly 属性
+    // 为了安全，在生产环境中使用 HTTPS，以保护 Cookie 的传输安全
+    // Max-Age= 2592000 秒 = 30 天
+    document.cookie = `refresh_token=${token}; Max-Age=2592000; Path=/; SameSite=Lax`;
 }
 
 
 // 获取用户信息并存储
 export async function fetchAndStoreUserInfo() {
     try {
+        // 向后端请求用户信息
         const { data: userInfo } = await apiClient.get('/user/user_info');
         storeUserInfo(userInfo);
     } catch (error) {
@@ -162,10 +168,13 @@ export function getAccessToken() {
 // 使用授权码获取令牌并存储
 export async function fetchAndStoreTokens(code) {
     try {
+        // 向后端发送请求, 使用授权码获取令牌
         const { data } = await apiClient.post('/user/token/', { code });
         console.log('获取令牌成功:', data); // 添加调试信息
+        // 存储令牌, 包括 refresh_token
         storeTokens(data.access_token, data.id_token, data.refresh_token);
-        await fetchAndStoreUserInfo(); // 获取并缓存用户信息
+        // 获取并缓存用户信息
+        await fetchAndStoreUserInfo();
     } catch (error) {
         console.error('获取令牌失败:', error);
         logoutAndRedirect(); // 失败时重定向到退出

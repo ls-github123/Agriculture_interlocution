@@ -98,6 +98,11 @@ async def refresh_Authing_token(refresh_token: str) -> dict:
         try:
             response = await client.post(AUTHING_CONFIG['token_url'], data=data)
             response.raise_for_status()
-            return response.json() # 返回新的 Access Token 和 Refresh Token
+            tokens = response.json() # 获取响应的 JSON 数据
+            
+            # 检查响应中是否包含新的 refresh_token
+            new_refresh_token = tokens.get('refresh_token', refresh_token)
+            tokens['refresh_token'] = new_refresh_token  # 更新 tokens 字典中的 refresh_token
+            return tokens  # 返回包含新的 Access Token、ID Token 和 Refresh Token
         except httpx.HTTPStatusError as e:
             raise Exception(f"刷新 Access Token 失败: {e.response.status_code} - {e.response.text}")

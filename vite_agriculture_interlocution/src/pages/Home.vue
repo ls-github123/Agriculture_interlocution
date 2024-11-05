@@ -19,7 +19,7 @@
         <i class="fas fa-shopping-cart"></i>
 
         <!-- 用户登录图标或已登录头像图标 -->
-        <el-dropdown v-if="isLoggedIn" trigger="hover" placement="bottom">
+        <el-dropdown v-if="userInfo" trigger="hover" placement="bottom">
           <span class="el-dropdown-link">
             <img :src="userInfo.picture" class="user-avatar" alt="用户头像" />
           </span>
@@ -30,12 +30,12 @@
                 <p><strong>用户名：</strong> {{ userInfo.username }}</p>
                 <p><strong>手机号：</strong> {{ userInfo.phone_number }}</p>
                 <p><strong>实名状态：</strong> {{ userInfo.is_verified ? '已认证' : '未认证' }}</p>
-                <el-button type="danger" size="small" @click="handleLogout">登出</el-button>
+                <el-button type="danger" size="small" @click="logout">登出</el-button>
               </div>
             </el-card>
           </template>
         </el-dropdown>
-        <el-button v-else type="primary" @click="handleLogin">登录</el-button>
+        <el-button v-else type="primary" @click="login">登录</el-button>
       </div>
     </nav>
     <section class="hero" :style="{ backgroundImage: `url(${currentImage})` }">
@@ -63,13 +63,19 @@
 </template>
 
 <script setup>
+// 引入 Vue 组合式 API 函数
 import { ref, onMounted, onUnmounted, computed } from 'vue';
+
+// 引入 Element Plus 组件
 import { ElButton, ElDropdown, ElCard } from 'element-plus';
 import 'element-plus/dist/index.css';
-import { redirectToAuthing, getAuthorizationCode, fetchAndStoreTokens, getUserInfo, logoutAndRedirect } from '../utils/authing';
+
+//引入封装的认证逻辑
+import { useAuth } from '../composables/useAuth';
 import Footer from '../components/Footer.vue';
 import blobConfig from '../config/blobConfig';// 引入容器存储资源
 
+// 图片资源配置
 const images = [
   `${blobConfig.baseBlobUrl}/bg-img/1.jpg`,
   `${blobConfig.baseBlobUrl}/bg-img/3.jpg`,
@@ -85,11 +91,15 @@ const d2_1 = [
   `${blobConfig.baseBlobUrl}/gif/tractor.gif`,
   `${blobConfig.baseBlobUrl}/gif/discuss.gif`,
 ];
+
+// 定义当前图片索引和轮播定时器
 const currentIndex = ref(0);
 const interval = ref(null);
 
+// 计算属性，获取当前要显示的图片
 const currentImage = computed(() => images[currentIndex.value]);
 
+// 获取文本描述
 const getText = (index) => {
   const texts = ['最佳服务', '农场管理', '100%天然', '农用设备', '社区讨论'];
   return texts[index];
@@ -100,6 +110,7 @@ const navigateToPage = (index) => {
   window.location.href = pages[index];
 };
 
+// 定义图片切换函数
 const nextImage = () => {
   currentIndex.value = (currentIndex.value + 1) % images.length;
 };
@@ -116,52 +127,13 @@ onUnmounted(() => {
   clearInterval(interval.value); // 清理定时器
 });
 
-// 登录状态和用户信息
-const isLoggedIn = ref(false);
-const userInfo = ref({
-  username: '',
-  avatar: `${blobConfig.baseBlobUrl}/bg-img/33.jpg`, // 默认头像
-  phone: '',
-  isVerified: false,
-});
+// 使用认证逻辑
+const { userInfo, login, logout, init } = useAuth();
 
-// 处理登录逻辑
-const handleLogin = () => {
-  console.log("Login button clicked");
-  redirectToAuthing(); // 跳转到 Authing 登录页面
-};
-
-// 处理登出逻辑
-const handleLogout = () => {
-  logoutAndRedirect(); // 清除登录状态并重定向到首页
-};
-
-// 检查 URL 中 是否包含授权码并处理登录回调
-onMounted(async () => {
-  const code = getAuthorizationCode();
-  if (code) {
-    try {
-      // 使用授权码获取并存储令牌和用户信息
-      await fetchAndStoreTokens(code);
-      userInfo.value = getUserInfo(); // 获取并设置用户信息
-      isLoggedIn.value = true;
-      console.log('登录成功，用户已登录:', isLoggedIn.value); // 调试信息
-    } catch (error) {
-      console.error('登录失败:', error);
-      logoutAndRedirect(); // 如果获取令牌失败，登出并重定向
-    }
-  } else {
-    const user = getUserInfo();
-    if (user) {
-      userInfo.value ={
-        username: user.username || '未知用户',
-        picture: user.picture || `${blobConfig.baseBlobUrl}/bg-img/33.jpg`,
-        phone: user.phone_number || '未提供',
-        isVerified: user.isVerified || false,
-      };
-      isLoggedIn.value = true;
-    }
-  }
+// 初始化认证状态
+// 在组件中
+onMounted(() => {
+  init(); // 初始化认证状态
 });
 </script>
   
