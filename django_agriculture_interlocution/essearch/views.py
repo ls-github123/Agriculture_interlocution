@@ -5,7 +5,10 @@ from .models import AgricultureKnowledge
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
+import warnings
 
+# 抑制所有Elasticsearch相关的警告
+warnings.filterwarnings("ignore", module="elasticsearch")
 
 # es上传数据
 es = Elasticsearch("http://20.40.103.205:9200/")
