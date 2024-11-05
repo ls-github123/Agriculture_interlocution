@@ -5,9 +5,7 @@ import Dashboard from '../components/Dashboard.vue';
 import SearchData from '../components/SearchData.vue';
 
 const routes = [
-    { path: '/', component: Home },
-    { path: '/login', component: Login }, // 添加login路由
-    { path: '/dashboard', component: Dashboard },
+    { path: '/home', name: 'Home', component: Home },
     { path: '/SearchData', component: SearchData },
 ];
 

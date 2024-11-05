@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { getCSRFToken } from './csrf';
+import { refreshAccessToken } from './authing';
 
 // 创建Axios实例
 const apiClient = axios.create({
@@ -11,17 +12,30 @@ const apiClient = axios.create({
     withCredentials: true, // 确保发送cookie
 });
 
-// 请求拦截器: 在每个请求中添加 CSRF TOKEN
-apiClient.interceptors.request.use((config) => {
-    const csrftoken = getCSRFToken();
-    if (csrftoken) {
-        config.headers['X-CSRFToken'] = csrftoken; // 设置 CSRF Token
-    }
-    const accessToken = sessionStorage.getItem('access_token');
-    if (accessToken) {
-        config.headers.Authorization = `Bearer ${accessToken}`;
-    }
-    return config;
-}, (error) => Promise.reject(error));
+// 请求拦截器: 在每个请求中添加 CSRF TOKEN 和 Access Token
+apiClient.interceptors.request.use(
+    async (config) => {
+        const csrftoken = getCSRFToken();
+        if (csrftoken) {
+            config.headers['X-CSRFToken'] = csrftoken;
+        }
+
+        let accessToken = sessionStorage.getItem('access_token');
+
+        // 检查 AccessToken是否存在，若无则尝试刷新
+        if (!accessToken) {
+            await refreshAccessToken();
+            accessToken = sessionStorage.getItem('access_token');
+        }
+
+        // 添加 Authorization Header
+        if (accessToken) {
+            config.headers.Authorization = `Bearer ${accessToken}`;
+        }
+
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
 
 export default apiClient;
