@@ -7,7 +7,7 @@
       </div>
       <ul class="nav-links">
         <li><a href="#">首页</a></li>
-        <<li><router-link to="/hme">服务</router-link></li>
+        <li><router-link to="/hme">服务</router-link></li>
         <li><a href="#">产品</a></li>
         <li><a href="#">农业行情</a></li>
         <li><a href="#">联系我们</a></li>
