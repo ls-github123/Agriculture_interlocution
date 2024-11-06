@@ -1,0 +1,55 @@
+<template>
+    <div>
+      <h1>购物车</h1>
+      <div v-if="cart.cart_items.length > 0">
+        <div v-for="item in cart.cart_items" :key="item.id" class="cart-item">
+          <p>{{ item.product.name }} - {{ item.quantity }} x {{ item.product.price }}元
+            <button @click="removeFromCart(item.id)">删除</button>
+          </p>
+        </div>
+        <p>总价: {{ cart.total_price }}元</p>
+      </div>
+      <p v-else>购物车为空</p>
+    </div>
+  </template>
+  
+  <script>
+  import axios from 'axios';
+  
+  export default {
+    data() {
+      return {
+        cart: {
+          cart_items: [],
+          total_price: 0
+        }
+      };
+    },
+    created() {
+      this.fetchCart();
+    },
+    methods: {
+      // 获取购物车内容
+      async fetchCart() {
+        try {
+          const response = await axios.get('http://localhost:8000/api/cart/');
+          this.cart = response.data;
+        } catch (error) {
+          console.error('Failed to fetch cart:', error);
+        }
+      },
+  
+      // 删除购物车中的商品
+      async removeFromCart(itemId) {
+        try {
+          await axios.delete(`http://localhost:8000/api/cart/items/${itemId}/`);
+          this.cart.cart_items = this.cart.cart_items.filter(item => item.id !== itemId);
+          this.cart.total_price = this.cart.cart_items.reduce((total, item) => total + parseFloat(item.total_price), 0);
+        } catch (error) {
+          console.error('Failed to remove item:', error);
+        }
+      }
+    }
+  };
+  </script>
+  

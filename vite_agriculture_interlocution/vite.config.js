@@ -11,6 +11,12 @@ export default defineConfig({
   },
   server: {
     proxy: {
+      // 代理请求到 Django 后端
+      '/api': {
+        target: 'http://localhost:8000', // Django 后端的地址
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''), // 去掉 /api 前缀，方便后端处理
+      },
       '/oidc': {
         target: 'https://agricultureinterlocution.authing.cn',
         changeOrigin: true,
