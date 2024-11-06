@@ -5,7 +5,7 @@
         <div v-for="order in orders" :key="order.id" class="order-item">
           <p>订单ID: {{ order.id }} - 总价: {{ order.total_price }}元</p>
           <button @click="viewOrderDetails(order.id)">查看详情</button>
-          <button @click="payOrder(order.id)">支付</button>
+          
         </div>
       </div>
       <p v-else>没有订单</p>

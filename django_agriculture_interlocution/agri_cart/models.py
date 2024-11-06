@@ -46,6 +46,7 @@ class agr_Order(models.Model):
     cart = models.ForeignKey(agr_Cart, on_delete=models.CASCADE)  # 购物车
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)  # 订单总价
     created_at = models.DateTimeField(auto_now_add=True)  # 创建时间
+    status = models.CharField(max_length=50, default='pending')  # 订单状态
 
     def __str__(self):
         return f"订单 {self.id} - {self.user}"

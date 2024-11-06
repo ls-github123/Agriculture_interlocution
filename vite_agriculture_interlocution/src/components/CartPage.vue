@@ -8,7 +8,7 @@
           </p>
         </div>
         <p>总价: {{ cart.total_price }}元</p>
-        <button @click="checkout">结算</button>
+        <button @click="checkout">生成订单</button>
       </div>
       <p v-else>购物车为空</p>
       <button @click="goToOrders">查看订单列表</button>  <!-- 新增跳转订单列表按钮 -->

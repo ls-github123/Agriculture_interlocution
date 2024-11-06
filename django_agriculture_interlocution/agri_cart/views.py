@@ -1,13 +1,99 @@
 from django.shortcuts import render
 
 # Create your views here.
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
+from django.conf import settings
 from rest_framework.decorators import api_view
 from rest_framework import status
-from .models import *
-from .serializers import ProductSerializer, CartSerializer
+
+from .models import agr_Product,agr_Cart,agr_CartItem,agr_Order
+
+from tools.comm import get_alipay  # 导入封装好的支付宝实例获取函数
+
+
+
+
+from django.http import HttpResponse
+
+
+# 支付宝支付回调通知视图
+class AlipayNotifyView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        try:
+            # 获取支付宝实例
+            alipay = get_alipay()
+
+            # 获取支付宝的回调通知参数
+            data = request.POST.dict()
+            signature = data.pop('sign', None)
+
+            # 验证支付结果
+            if alipay.verify(data, signature):
+                order_id = data.get('out_trade_no')
+                trade_status = data.get('trade_status')
+
+                # 如果支付成功，更新订单状态
+                if trade_status == 'TRADE_SUCCESS':
+                    order = agr_Order.objects.get(id=order_id)
+                    order.status = 'PAID'  # 假设你有支付状态字段
+                    order.save()
+
+                    return HttpResponse("success")
+                else:
+                    return HttpResponse("fail")
+            else:
+                return HttpResponse("fail")
+        except Exception as e:
+            print(f"Error: {e}")  # 输出错误信息
+            return HttpResponse("fail")
+
+
+
+
+
+
+# 支付请求视图
+class AlipayPaymentView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, order_id):
+        try:
+            # 获取订单信息
+            order = agr_Order.objects.get(id=order_id)
+            total_price = order.total_price  # 订单总金额
+
+            # 获取支付宝实例
+            alipay = get_alipay()  # 使用封装好的函数获取支付宝实例
+
+            # 使用 AliPay 类的 direct_pay 方法生成支付请求数据
+            order_string = alipay.direct_pay(
+                subject="订单支付",  # 订单标题
+                out_trade_no=str(order.id),  # 订单号
+                total_amount=str(total_price),  # 订单金额
+                # return_url="http://localhost:8080/success",  # 支付成功后跳转的页面
+                # notify_url="http://localhost:8000/api/alipay/notify/"  # 支付回调通知地址
+            )
+
+            # 支付页面跳转链接
+            pay_url = f"https://openapi-sandbox.dl.alipaydev.com/gateway.do?{order_string}"
+
+            return Response({
+                "pay_url": pay_url
+            }, status=status.HTTP_200_OK)
+
+        except agr_Order.DoesNotExist:
+            return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            print(f"Error: {e}")  # 输出详细错误信息到控制台
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
 
 
 

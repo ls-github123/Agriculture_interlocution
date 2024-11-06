@@ -10,4 +10,12 @@ urlpatterns = [
     
     path('orders/', OrderListView.as_view(), name='order-list'),
     path('orders/<int:id>/', OrderDetailView.as_view(), name='order-detail'),
+
+
+    # 创建支付链接
+    path('alipay/<int:order_id>/', AlipayPaymentView.as_view(), name='alipay_payment'),
+    
+    # 支付回调通知
+    path('alipay/notify/', AlipayNotifyView.as_view(), name='alipay_notify'),
+
 ]
