@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'rest_framework', # DRF支持
     'usermodule', # 子应用-用户模块
     'servers',#子应用-服务模块
+    'customized',#子应用-定制服务模块
 ]
 
 
