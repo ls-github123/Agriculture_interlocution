@@ -1,8 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
-
-// 懒加载组件
-const Home = () => import('../pages/Home.vue');
-const SearchData = () => import('../components/SearchData.vue');
+import Home from '../pages/Home.vue';
+import SearchData from '../components/SearchData.vue';
 
 const routes = [
     { path: '/home', name: 'Home', component: Home },
@@ -15,3 +13,4 @@ const router = createRouter({
 });
 
 export default router;
+
