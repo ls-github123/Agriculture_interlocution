@@ -9,6 +9,34 @@ from rest_framework import status
 from .models import *
 from .serializers import ProductSerializer, CartSerializer
 
+
+
+class CheckoutView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        try:
+            # 假设用户身份为 guest，实际中应根据用户身份来创建购物车
+            cart, created = agr_Cart.objects.get_or_create(user="guest")
+
+            # 创建订单
+            order = agr_Order.objects.create(cart=cart, user=cart.user)
+            order.update_total_price()  # 更新订单总价为购物车的总价
+
+            # 清空购物车（结算后购物车清空）
+            cart.cart_items.all().delete()
+
+            return Response({
+                "message": "订单已创建",
+                "order_id": order.id,
+                "total_price": str(order.total_price)
+            }, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
 # 获取商品列表
 class ProductListView(APIView):
     permission_classes = [AllowAny]
@@ -42,7 +70,7 @@ class CartView(APIView):
             cart.update_total_price()
 
             # 获取购物车中的商品项
-            cart_items = cart.cart_items.all()  # 使用 'cart_items' 反向关系
+            cart_items = cart.cart_items.all()  # 使用 'cart_items' 来代替 'cartitem_set'
             cart_items_data = [
                 {
                     "id": item.id,
@@ -100,7 +128,6 @@ class AddToCartView(APIView):
             return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 
 

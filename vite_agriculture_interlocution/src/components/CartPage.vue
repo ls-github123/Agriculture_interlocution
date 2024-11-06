@@ -8,6 +8,7 @@
           </p>
         </div>
         <p>总价: {{ cart.total_price }}元</p>
+        <button @click="checkout">结算</button>
       </div>
       <p v-else>购物车为空</p>
     </div>
@@ -47,6 +48,20 @@
           this.cart.total_price = this.cart.cart_items.reduce((total, item) => total + parseFloat(item.total_price), 0);
         } catch (error) {
           console.error('Failed to remove item:', error);
+        }
+      },
+  
+      // 结算并创建订单
+      async checkout() {
+        try {
+          const response = await axios.post('http://localhost:8000/api/cart/checkout/');
+          alert('订单已创建，订单ID：' + response.data.order_id);
+          this.cart = {
+            cart_items: [],
+            total_price: 0
+          };
+        } catch (error) {
+          console.error('Failed to create order:', error);
         }
       }
     }
