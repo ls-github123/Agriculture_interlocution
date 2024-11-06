@@ -17,13 +17,12 @@ export function useAuth() {
   // 使用 ref 定义 userInfo，因为它是一个单独的响应式属性
   const userInfo = ref(null);
 
-  // 初始化，获取用户信息
+  // 初始化，检查是否已认证并获取用户信息
   function init() {
-    const user = getUserInfo();
-    if (user) {
-      userInfo.value = user;
+    if (isAuthenticated()) {
+      userInfo.value = getUserInfo();
     } else {
-        userInfo.value = null; // 确保未登录时 userInfo 为 null
+      userInfo.value = null;
     }
   }
 
@@ -50,6 +49,5 @@ export function useAuth() {
     init,
     login,
     logout,
-    isAuthenticated,
   };
 }

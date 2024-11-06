@@ -6,7 +6,7 @@ import apiClient from "./axios";
 const AUTHING_CONFIG = {
     appId: '671a02c6ef4cdd625a133fcd', // Authing App ID
     appHost: 'https://agricultureinterlocution.authing.cn', // Authing 认证(应用)地址
-    redirectUri: 'http://localhost:5173/home', // 登录回调地址
+    redirectUri: 'http://127.0.0.1:5173/home', // 登录回调地址
 };
 
 
@@ -95,14 +95,14 @@ export function storeTokens(accessToken, idToken, refreshToken) {
     console.log('成功存储令牌');
 }
 
-// 存储 Access Token 到 sessionStorage
+// 存储 Access Token 到 localStorage
 function storeAccessToken(token) {
-    sessionStorage.setItem('access_token', token);
+    localStorage.setItem('access_token', token);
 }
 
-// 存储 ID Token 到 sessionStorage
+// 存储 ID Token 到 localStorage
 function storeIdToken(token) {
-    sessionStorage.setItem('id_token', token);
+    localStorage.setItem('id_token', token);
 }
 
 // 存储 Refresh Token 到 HttpOnly Cookie 中
@@ -127,27 +127,21 @@ export async function fetchAndStoreUserInfo() {
     }
 }
 
-// 存储用户信息到 sessionStorage
+// 存储用户信息到 localStorage
 function storeUserInfo(userInfo) {
-    sessionStorage.setItem('user_info', JSON.stringify(userInfo));
+    localStorage.setItem('user_info', JSON.stringify(userInfo));
     console.log('用户信息已缓存');
 }
 
 // 获取用户信息
 export function getUserInfo() {
-    const userInfo = sessionStorage.getItem('user_info');
+    const userInfo = localStorage.getItem('user_info');
     return userInfo ? JSON.parse(userInfo) : null;
-}
-
-// 清除用户信息
-function clearUserInfo() {
-    sessionStorage.removeItem('user_info');
 }
 
 // 退出登录 -- 清理所有授权状态并登出
 export function logoutAndRedirect() {
     clearAuthState();
-    clearUserInfo();
     const logoutUrl = `${AUTHING_CONFIG.appHost}/oidc/session/end`+
                       `?post_logout_redirect_uri=${encodeURIComponent(window.location.origin)}`;
     window.location.href = logoutUrl;
@@ -155,14 +149,27 @@ export function logoutAndRedirect() {
 
 // 清除本地授权状态
 function clearAuthState() {
-    sessionStorage.removeItem('access_token');
-    sessionStorage.removeItem('id_token');
+    localStorage.removeItem('access_token'); // 清除 access_token
+    localStorage.removeItem('id_token'); // 清除id_token
+    localStorage.removeItem('user_info'); // 清除用户信息
     document.cookie = 'refresh_token=; Max-Age=0; path=/;';
 }
 
-// 获取存储在 sessionStorage 中的 Access Token
+// 获取存储在 localStorage 中的 Access Token
 export function getAccessToken() {
-    return sessionStorage.getItem('access_token');
+    return localStorage.getItem('access_token');
+}
+
+// 清除指定的 URL code参数
+function clearUrlParams(params, delay = 100) {
+    setTimeout(() => {
+        const url = new URL(window.location.href);
+        params.forEach(param => url.searchParams.delete(param));
+        // 强制更新 URL
+        // 使用 replaceState 直接替换当前 URL，避免增加历史记录
+        window.history.replaceState(null, '', url.toString());
+        console.log('URL 中的指定参数已清除:', params);
+    }, delay); // 延迟，以确保其他操作完成后再清除code参数
 }
 
 // 使用授权码获取令牌并存储
@@ -175,8 +182,17 @@ export async function fetchAndStoreTokens(code) {
         storeTokens(data.access_token, data.id_token, data.refresh_token);
         // 获取并缓存用户信息
         await fetchAndStoreUserInfo();
+
+        // 清除 URL 中的授权码参数
+        clearUrlParams(['code', 'state']);
     } catch (error) {
         console.error('获取令牌失败:', error);
         logoutAndRedirect(); // 失败时重定向到退出
     }
+}
+
+// 检查是否已认证
+export function isAuthenticated() {
+    const token = getAccessToken();
+    return token && !isTokenExpired(token);
 }
