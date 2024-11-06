@@ -3,7 +3,7 @@ import Home from '../pages/Home.vue';
 import SearchData from '../components/SearchData.vue';
 
 const routes = [
-    { path: '/home', name: 'Home', component: Home },
+    { path: '/', name: 'Home', component: Home },
     { path: '/SearchData', component: SearchData },
 ];
 
