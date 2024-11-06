@@ -11,6 +11,7 @@
         <button @click="checkout">结算</button>
       </div>
       <p v-else>购物车为空</p>
+      <button @click="goToOrders">查看订单列表</button>  <!-- 新增跳转订单列表按钮 -->
     </div>
   </template>
   
@@ -63,6 +64,11 @@
         } catch (error) {
           console.error('Failed to create order:', error);
         }
+      },
+  
+      // 跳转到订单列表
+      goToOrders() {
+        this.$router.push({ name: 'OrderListPage' });
       }
     }
   };

@@ -11,6 +11,55 @@ from .serializers import ProductSerializer, CartSerializer
 
 
 
+# 获取订单详情的视图
+class OrderDetailView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, id):
+        try:
+            order = agr_Order.objects.get(id=id)
+            order_data = {
+                "id": order.id,
+                "total_price": str(order.total_price),
+                "created_at": order.created_at,
+                "cart_items": [
+                    {
+                        "product_name": item.product.name,
+                        "quantity": item.quantity,
+                        "price": str(item.product.price),
+                        "total_price": str(item.total_price())
+                    }
+                    for item in order.cart.cart_items.all()
+                ]
+            }
+            return Response(order_data)
+        except agr_Order.DoesNotExist:
+            return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+# 获取订单列表的视图
+class OrderListView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        try:
+            # 获取所有订单
+            orders = agr_Order.objects.all()
+            orders_data = [
+                {
+                    "id": order.id,
+                    "total_price": str(order.total_price),
+                    "created_at": order.created_at,
+                }
+                for order in orders
+            ]
+            return Response(orders_data)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
 class CheckoutView(APIView):
     permission_classes = [AllowAny]
 

@@ -11,10 +11,12 @@ const SearchData = () => import('../components/SearchData.vue');
 const ProductPage = () => import('../components/ProductPage.vue');
 const CartPage = () => import('../components/CartPage.vue');
 
-
+const OrderListPage = () => import('../components/OrderListPage.vue');
+const OrderDetailPage = () => import('../components/OrderDetailPage.vue');
 
 const routes = [
-
+    { path: '/orders', name: 'OrderListPage',component: OrderListPage },
+    { path: '/orders/:id', name: 'OrderDetailPage',component: OrderDetailPage ,props: true },// 允许将路由参数传递给组件作为 props
 
     { path: '/cart', component: CartPage },
     { path: '/ProductPage', component: ProductPage },
