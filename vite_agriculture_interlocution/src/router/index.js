@@ -3,7 +3,11 @@ import { createRouter, createWebHistory } from 'vue-router';
 // 懒加载组件
 const Home = () => import('../pages/Home.vue');
 const SearchData = () => import('../components/SearchData.vue');
-
+const HmeView = ( ) => import('../view/HmeView.vue');
+const Service = () => import('../view/Service.vue');
+const ExpertGen = () => import('../view/ExpertGen.vue');
+const HarvestingFrom = () => import('../view/HarvestingFrom.vue');
+const IrrigationFrom = () => import ('../view/IrrigationFrom.vue');
 // 引入认证相关函数
 import { getAuthorizationCode, fetchAndStoreTokens, isAuthenticated } from '../utils/authing';
 
