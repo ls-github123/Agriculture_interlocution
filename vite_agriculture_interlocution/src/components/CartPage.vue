@@ -41,7 +41,7 @@
       // 获取购物车内容
       async fetchCart() {
         try {
-          const response = await axios.get('http://localhost:8000/api/cart/');
+          const response = await axios.get('http://localhost:8000/agri_cart/cart/');
           this.cart = response.data;
         } catch (error) {
           console.error('Failed to fetch cart:', error);
@@ -51,7 +51,7 @@
       // 删除购物车中的商品
       async removeFromCart(itemId) {
         try {
-          await axios.delete(`http://localhost:8000/api/cart/items/${itemId}/`);
+          await axios.delete(`http://localhost:8000/agri_cart/cart/items/${itemId}/`);
           this.cart.cart_items = this.cart.cart_items.filter(item => item.id !== itemId);
           this.cart.total_price = this.cart.cart_items.reduce((total, item) => total + parseFloat(item.total_price), 0);
         } catch (error) {
@@ -62,7 +62,7 @@
       // 结算并创建订单
       async checkout() {
         try {
-          const response = await axios.post('http://localhost:8000/api/cart/checkout/');
+          const response = await axios.post('http://localhost:8000/agri_cart/cart/checkout/');
           alert('订单已创建，订单ID：' + response.data.order_id);
           this.cart = {
             cart_items: [],

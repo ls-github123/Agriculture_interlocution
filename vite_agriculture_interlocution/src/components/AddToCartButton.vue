@@ -12,7 +12,7 @@
     methods: {
       async addToCart(productId) {
         try {
-          await axios.post('http://localhost:8000/api/cart/add/', { product_id: productId, quantity: 1 });
+          await axios.post('http://localhost:8000/agri_cart/cart/add/', { product_id: productId, quantity: 1 });
           this.$emit('added', productId); // 通知父组件更新购物车
         } catch (error) {
           console.error('Failed to add product to cart:', error);

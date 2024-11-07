@@ -38,7 +38,7 @@ export default {
     // 获取订单列表
     async fetchOrders() {
       try {
-        const response = await axios.get('http://localhost:8000/api/orders/');
+        const response = await axios.get('http://localhost:8000/agri_cart/orders/');
         this.orders = response.data;
       } catch (error) {
         console.error('Failed to fetch orders:', error);

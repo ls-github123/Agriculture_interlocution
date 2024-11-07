@@ -47,7 +47,7 @@ export default {
     // 获取订单详情
     async fetchOrderDetails(orderId) {
       try {
-        const response = await axios.get(`http://localhost:8000/api/orders/${orderId}/`);
+        const response = await axios.get(`http://localhost:8000/agri_cart/orders/${orderId}/`);
         this.order = response.data;
       } catch (error) {
         console.error('Failed to fetch order details:', error);
@@ -70,7 +70,7 @@ export default {
     // 调用支付接口，跳转支付宝支付页面
     async pay() {
       try {
-        const response = await axios.post(`http://localhost:8000/api/alipay/${this.id}/`);
+        const response = await axios.post(`http://localhost:8000/agri_cart/alipay/${this.id}/`);
         window.location.href = response.data.pay_url;  // 跳转到支付宝支付页面
       } catch (error) {
         console.error('Failed to initiate payment:', error);

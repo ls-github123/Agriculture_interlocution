@@ -43,7 +43,7 @@ export default {
     // 获取商品列表
     async fetchProducts() {
       try {
-        const response = await axios.get('http://localhost:8000/api/products/');
+        const response = await axios.get('http://localhost:8000/agri_cart/products/');
         this.products = response.data;
       } catch (error) {
         console.error('Failed to fetch products:', error);
@@ -53,7 +53,7 @@ export default {
     // 将商品添加到购物车
     async addToCart(productId) {
       try {
-        await axios.post('http://localhost:8000/api/cart/add/', { product_id: productId, quantity: 1 });
+        await axios.post('http://localhost:8000/agri_cart/cart/add/', { product_id: productId, quantity: 1 });
         alert('商品已加入购物车');
       } catch (error) {
         console.error('Failed to add product to cart:', error);
