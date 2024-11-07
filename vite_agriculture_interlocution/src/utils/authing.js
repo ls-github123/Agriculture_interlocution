@@ -6,7 +6,7 @@ import apiClient from "./axios";
 const AUTHING_CONFIG = {
     appId: '671a02c6ef4cdd625a133fcd', // Authing App ID
     appHost: 'https://agricultureinterlocution.authing.cn', // Authing 认证(应用)地址
-    redirectUri: 'http://127.0.0.1:5173/home', // 登录回调地址
+    redirectUri: 'http://127.0.0.1:5173/', // 登录回调地址
 };
 
 

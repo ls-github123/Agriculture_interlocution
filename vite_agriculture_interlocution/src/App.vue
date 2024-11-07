@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <router-view />  <!-- 路由视图用于渲染当前匹配的页面组件 -->
+    <router-view></router-view>  <!-- 路由视图用于渲染当前匹配的页面组件 -->
   </div>
 </template>
 
