@@ -36,6 +36,7 @@
 <script>
 import axios from 'axios'; // 导入axios用于发送HTTP请求
 import blobConfig from '../config/blobConfig';
+import apiClient from '../utils/axios';
 
 
 
@@ -65,7 +66,7 @@ export default {
       this.loadingStartedAt = new Date().getTime(); // 记录加载开始时间
       try {
         // 发送GET请求到后端API获取搜索结果
-        const response = await axios.get('http://127.0.0.1:8000/essearch/search/', {
+        const response = await apiClient.get('/essearch/search', {
           params: {
             page: this.currentPage, // 请求的页码
             page_size: this.pageSize, // 每页大小
