@@ -22,7 +22,7 @@
             icon: '/images/farming.png',
             title: '种植服务',
             content: '提供专业的种植技术服务，包括土壤检测、种子选择等。',
-            to: '/services/farming',
+            to: '/plant',
             backgroundColor: '#1bed1b', // 背景颜色
             backgroundImage: 'url(/images/irrigatn.png)', // 背景图片
             contentColor: '#333333',//内容颜色
