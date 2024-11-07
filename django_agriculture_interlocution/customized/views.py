@@ -8,7 +8,7 @@ from .serializers import HarvestRequestSerializer,IrrigationRequestSerializer
 from .models import HarvestRequest
 
 class HarvestRequestView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [AllowAny]#身份信息验证
     def post(self, request):
         serializer = HarvestRequestSerializer(data=request.data)
         if serializer.is_valid():
@@ -18,6 +18,7 @@ class HarvestRequestView(APIView):
     
 
 class IrrigationRequestView(APIView):
+    permission_classes = [AllowAny]#身份信息验证
     def post(self, request):
         serializer = IrrigationRequestSerializer(data=request.data)
         if serializer.is_valid():

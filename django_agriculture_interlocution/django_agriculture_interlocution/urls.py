@@ -20,6 +20,6 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/', include('usermodule.urls')), # 子应用-用户模块
-    path('api/', include('servers.urls')), # 子应用-服务模块
+    path('app/', include('servers.urls')), # 子应用-服务模块
     path('',include('customized.urls'))#子应用-定制模块
 ]

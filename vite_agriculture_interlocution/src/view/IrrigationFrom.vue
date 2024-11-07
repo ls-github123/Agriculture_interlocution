@@ -51,7 +51,7 @@ const formData = ref({
 
 const handleSubmit = async () => {
   try {
-    const response = await axios.post('http://localhost:8000/api/irrigation', formData.value);
+    const response = await axios.post('http://localhost:8000/api/irrigation/', formData.value);
     alert('申请成功！');
     console.log(response.data);
   } catch (error) {
