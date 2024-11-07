@@ -114,7 +114,7 @@ const getText = (index) => {
 };
 
 const navigateToPage = (index) => {
-  const pages = ['/service', '/farm-experience', '/natural-products', '/agricultural-equipment', '/organic-food'];
+  const pages = ['/ProductPage', '/farm-experience', '/ProductPage', '/agricultural-equipment', '/organic-food'];
   window.location.href = pages[index];
 };
 
