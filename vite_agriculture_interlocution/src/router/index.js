@@ -1,9 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-
-
-
-
 // 懒加载组件
 const Home = () => import('../pages/Home.vue');
 const SearchData = () => import('../components/SearchData.vue');
