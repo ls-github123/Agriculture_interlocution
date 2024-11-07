@@ -19,7 +19,7 @@ class HarvestRequest(models.Model):
     name = models.CharField(max_length=100, null=True)
     phone = models.CharField(max_length=15, null=True)
     address = models.TextField()
-    crop_type = models.IntegerField(choices=CROP_TYPE)
+    cropType = models.IntegerField(choices=CROP_TYPE)
 
     def __str__(self):
         return self.name

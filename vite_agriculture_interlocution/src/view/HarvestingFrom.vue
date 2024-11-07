@@ -10,7 +10,7 @@
       </div>
       <div class="form-group">
         <label for="phone">电话：</label>
-        <input type="tel" id="phone" v-model="formData.phone" required />
+        <input type="tel" id="phone" v-model="formData.phone" required/>
       </div>
       <div class="form-group">
         <label for="address">地址：</label>
@@ -18,11 +18,11 @@
       </div>
       <div class="form-group">
         <label for="cropType">作物类型：</label>
-        <select id="cropType" v-model="formData.cropType" required>
-          <option value="小麦">小麦</option>
-          <option value="玉米">玉米</option>
-          <option value="大豆">大豆</option>
-          <option value="其它">其它</option>
+        <select id="crop_Type" v-model="formData.cropType" required>
+          <option value="1">小麦</option>
+          <option value="2">玉米</option>
+          <option value="3">大豆</option>
+          <option value="4">其它</option>
         </select>
       </div>
       <button type="submit">提交申请</button>
@@ -33,6 +33,7 @@
 <script setup>
 import { ref } from 'vue';
 import axios from 'axios';
+import apiClient from '../utils/axios';
 
 const formData = ref({
   name: '',
@@ -53,7 +54,7 @@ const goBack = () =>{
 
   try {
     // 如果数据完整，继续发送请求
-    const response = await axios.post('http://localhost:3000/api/harvesting', formData.value);
+    const response = await apiClient.post('/custom/harvesting/', formData.value);
     alert('申请成功！');
     console.log(response.data);
   } catch (error) {
