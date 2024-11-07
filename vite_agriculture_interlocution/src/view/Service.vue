@@ -32,7 +32,7 @@
             icon: '/images/irrigation.png',
             title: '灌溉服务',
             content: '提供高效的灌溉系统设计和安装服务，确保农作物得到充足的水分。',
-            to: '/services/irrigation',
+            to: '/irrigation',
             backgroundColor: '#f0f8ff', // 背景颜色
             backgroundImage: 'url(images/background.jpg)', // 背景图片
             contentColor: '#333333',//内容颜色

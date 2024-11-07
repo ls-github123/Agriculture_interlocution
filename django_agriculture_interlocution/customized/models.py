@@ -28,3 +28,13 @@ class HarvestRequest(models.Model):
         db_table = 'harvesting'
         verbose_name = '收割'
         verbose_name_plural = '收割'
+
+class IrrigationRequest(models.Model):
+    name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=15)
+    address = models.TextField()
+    crop_type = models.CharField(max_length=50)
+    irrigation_type = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"{self.name} - {self.crop_type} - {self.irrigation_type}"

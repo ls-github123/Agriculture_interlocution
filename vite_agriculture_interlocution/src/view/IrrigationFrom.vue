@@ -1,6 +1,6 @@
 <template>
-  <div class="harvesting-form">
-    <h2>收割服务申请表</h2>
+  <div class="irrigation-form">
+    <h2>灌溉服务申请表</h2>
     <form @submit.prevent="handleSubmit">
       <div class="form-group">
         <label for="name">姓名：</label>
@@ -23,6 +23,15 @@
           <option value="其它">其它</option>
         </select>
       </div>
+      <div class="form-group">
+        <label for="irrigationType">灌溉类型：</label>
+        <select id="irrigationType" v-model="formData.irrigationType" required>
+          <option value="滴灌">滴灌</option>
+          <option value="喷灌">喷灌</option>
+          <option value="漫灌">漫灌</option>
+          <option value="其它">其它</option>
+        </select>
+      </div>
       <button type="submit">提交申请</button>
     </form>
   </div>
@@ -36,12 +45,13 @@ const formData = ref({
   name: '',
   phone: '',
   address: '',
-  cropType: ''
+  cropType: '',
+  irrigationType: ''
 });
 
 const handleSubmit = async () => {
   try {
-    const response = await axios.post('http://localhost:3000/api/harvesting', formData.value);
+    const response = await axios.post('http://localhost:8000/api/irrigation', formData.value);
     alert('申请成功！');
     console.log(response.data);
   } catch (error) {
@@ -49,19 +59,10 @@ const handleSubmit = async () => {
     alert('申请成功。');
   }
 };
-
-const handleSubmi = () => {
-  if (formData.value.name && formData.value.phone && formData.value.address && formData.value.cropType) {
-    alert('提交服务成功！', '农艺师将联系您提供服务');
-  } else {
-    alert('请填写完整信息！');
-  }
-};
 </script>
 
 <style scoped>
-/* 你可以在这里添加样式 */
-.harvesting-form {
+.irrigation-form {
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
