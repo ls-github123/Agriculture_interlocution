@@ -75,6 +75,14 @@ import { useAuth } from '../composables/useAuth';
 import Footer from '../components/Footer.vue';
 import blobConfig from '../config/blobConfig';// 引入容器存储资源
 
+// 使用认证逻辑
+const { userInfo, login, logout, init } = useAuth();
+
+// 初始化认证状态
+onMounted(() => {
+  init(); // 初始化认证状态
+});
+
 // 图片资源配置
 const images = [
   `${blobConfig.baseBlobUrl}/bg-img/1.jpg`,
@@ -125,15 +133,6 @@ onMounted(() => {
 
 onUnmounted(() => {
   clearInterval(interval.value); // 清理定时器
-});
-
-// 使用认证逻辑
-const { userInfo, login, logout, init } = useAuth();
-
-// 初始化认证状态
-// 在组件中
-onMounted(() => {
-  init(); // 初始化认证状态
 });
 </script>
   
