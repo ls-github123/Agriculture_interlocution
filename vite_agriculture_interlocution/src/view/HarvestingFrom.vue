@@ -41,7 +41,7 @@ const formData = ref({
 
 const handleSubmit = async () => {
   try {
-    const response = await axios.post('http://localhost:3000/app/harvesting', formData.value);
+    const response = await axios.post('http://localhost:3000/custom/harvesting', formData.value);
     alert('申请成功！');
     console.log(response.data);
   } catch (error) {

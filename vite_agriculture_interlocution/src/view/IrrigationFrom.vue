@@ -46,12 +46,12 @@ const formData = ref({
   phone: '',
   address: '',
   cropType: '',
-  irrigationType: ''
+  irrigationType: '',
 });
 
 const handleSubmit = async () => {
   try {
-    const response = await axios.post('http://localhost:8000/api/irrigation/', formData.value);
+    const response = await axios.post('http://localhost:8000/custom/irrigation/', formData.value);
     alert('申请成功！');
     console.log(response.data);
   } catch (error) {

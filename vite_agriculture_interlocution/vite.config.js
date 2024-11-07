@@ -15,7 +15,7 @@ export default defineConfig({
     proxy: {
       // 代理请求到 Django 后端
       '/api': {
-        target: 'http://localhost:8000', // Django 后端的地址
+        target: 'http://127.0.0.1:8000', // Django 后端的地址
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ''), // 去掉 /api 前缀，方便后端处理
       },
