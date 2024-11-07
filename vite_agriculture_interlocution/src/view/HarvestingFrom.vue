@@ -1,5 +1,7 @@
 <template>
   <div class="harvesting-form">
+    <!-- 返回上一页按钮 -->
+    <button class="back-btn" @click="goBack">← 返回</button>
     <h2>收割服务申请表</h2>
     <form @submit.prevent="handleSubmit">
       <div class="form-group">
@@ -38,25 +40,31 @@ const formData = ref({
   address: '',
   cropType: ''
 });
+// 返回上一页
+const goBack = () =>{
+       window.history.back()};
+       const handleSubmit = async () => {
+  // 首先检查表单数据是否完整
+  if (!formData.value.name || !formData.value.phone || !formData.value.address || !formData.value.cropType) {
+    // 如果数据不完整，显示错误提示并阻止表单提交
+    alert('请填写完整信息！');
+    return; // 阻止后续代码执行
+  }
 
-const handleSubmit = async () => {
   try {
+    // 如果数据完整，继续发送请求
     const response = await axios.post('http://localhost:3000/api/harvesting', formData.value);
     alert('申请成功！');
     console.log(response.data);
   } catch (error) {
+    // 如果请求失败，显示错误提示
     console.error('申请失败:', error);
-    alert('申请成功。');
+    alert('申请失败，请重试。');
   }
 };
 
-const handleSubmi = () => {
-  if (formData.value.name && formData.value.phone && formData.value.address && formData.value.cropType) {
-    alert('提交服务成功！', '农艺师将联系您提供服务');
-  } else {
-    alert('请填写完整信息！');
-  }
-};
+
+
 </script>
 
 <style scoped>
@@ -72,7 +80,25 @@ const handleSubmi = () => {
 .form-group {
   margin-bottom: 15px;
 }
+.back-btn {
+    float: left; /* 让按钮靠左浮动 */  
+  padding: 10px 20px; /* 按钮内边距 */
+  font-size: 16px; /* 字体大小 */
+  color: #fff; /* 字体颜色 */
+  background-color: #007bff; /* 背景颜色 */
+  border: none; /* 无边框 */
+  border-radius: 5px; /* 边框圆角 */
+  cursor: pointer; /* 鼠标悬停时显示指针 */
+  transition: background-color 0.3s; /* 背景颜色渐变效果 */
+}
 
+.back-btn:hover {
+  background-color: #0056b3; /* 鼠标悬停时的背景颜色 */
+}
+
+.back-btn:active {
+  background-color: #004085; /* 按钮被按下时的背景颜色 */
+}
 label {
   display: block;
   margin-bottom: 5px;

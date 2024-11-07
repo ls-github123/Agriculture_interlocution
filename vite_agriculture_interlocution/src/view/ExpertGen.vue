@@ -1,5 +1,7 @@
 <template>
     <div class="container">
+      <!-- 返回上一页按钮 -->
+       <button class="back-btn" @click="goBack">← 返回</button>
       <h2>农事咨询</h2>
       <form @submit.prevent="fnPostIssueInfo">
         <div class="form-group">
@@ -22,7 +24,9 @@
     species: '',
     
   });
-  
+  // 返回上一页
+    const goBack = () =>{
+       window.history.back()};
   // AI生成的回答
   const aiMsg = ref('');
   
@@ -58,7 +62,25 @@
     text-align: center;
     color: #333;
   }
-  
+  .back-btn {
+    float: left; /* 让按钮靠左浮动 */  
+  padding: 10px 20px; /* 按钮内边距 */
+  font-size: 16px; /* 字体大小 */
+  color: #fff; /* 字体颜色 */
+  background-color: #007bff; /* 背景颜色 */
+  border: none; /* 无边框 */
+  border-radius: 5px; /* 边框圆角 */
+  cursor: pointer; /* 鼠标悬停时显示指针 */
+  transition: background-color 0.3s; /* 背景颜色渐变效果 */
+}
+
+.back-btn:hover {
+  background-color: #0056b3; /* 鼠标悬停时的背景颜色 */
+}
+
+.back-btn:active {
+  background-color: #004085; /* 按钮被按下时的背景颜色 */
+}
   .form-group {
     margin-bottom: 15px;
   }
