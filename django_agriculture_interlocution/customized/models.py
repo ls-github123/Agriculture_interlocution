@@ -38,3 +38,14 @@ class IrrigationRequest(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.crop_type} - {self.irrigation_type}"
+    
+class Crop(models.Model):
+    name = models.CharField(max_length=100)
+    plantingdate = models.DateField()
+
+    def __str__(self):
+        return self.name
+    class Meta:
+        db_table = 'crop'
+        verbose_name = '种植'
+        verbose_name_plural = '种植'

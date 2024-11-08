@@ -39,7 +39,7 @@
   
   const fetchCrops = async () => {
     try {
-      const response = await apiClient.get('/api/crops');
+      const response = await apiClient.get('/custom/crops');
       crops.value = response.data;
     } catch (error) {
       console.error('获取作物列表失败:', error);
@@ -48,7 +48,7 @@
   
   const deleteCrop = async (id) => {
     try {
-      await apiClient.delete(`/api/crops/${id}`);
+      await apiClient.delete(`/custom/crops/${id}`);
       await fetchCrops();
     } catch (error) {
       console.error('删除作物失败:', error);
