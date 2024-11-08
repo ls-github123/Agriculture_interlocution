@@ -32,7 +32,7 @@
   
   // 发送请求
   function fnPostIssueInfo() {
-    axios.post('http://127.0.0.1:8000/api/genename/?species=', issue_info.species)
+    axios.post('http://127.0.0.1:8000/app/genename/?species=', issue_info.species)
       .then((response) => {
         if (response.data.code === 200) {
           

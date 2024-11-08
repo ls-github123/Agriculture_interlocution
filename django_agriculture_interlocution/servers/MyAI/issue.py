@@ -9,7 +9,7 @@ from langchain.schema import SystemMessage, HumanMessage, AIMessage
 # message = [sy, hu]
 
 
-def issue(species_dict,request=None):
+def issue(species_dict):
 
      try:   
         # 定义模板
@@ -31,10 +31,8 @@ def issue(species_dict,request=None):
         # 实例化通义大模型
         tongyi = Tongyi(api_key="sk-7120502d21944e6db08732969adae8a6")
         # 调用模型
-        if request is not None:
-            ret = tongyi.invoke(prompt_str, request=request)
-        else:
-            ret = tongyi.invoke(prompt_str)
+        
+        ret = tongyi.invoke(prompt_str)
         print("Model Response:", ret)
         print("Type of model response:", type(ret))
 

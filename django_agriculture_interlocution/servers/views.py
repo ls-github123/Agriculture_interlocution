@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class IssueView(APIView):
 
     permission_classes = [AllowAny] # 确保只有认证用户可以访问
-    # parser_classes=[FormParser,JSONParser]
+    parser_classes=[FormParser,JSONParser] #支持JSON和表单数据
     def post(self, request):
         try:
             # 获取请求数据
