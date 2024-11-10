@@ -33,7 +33,6 @@
 import { ref, onMounted } from 'vue';
 
 import apiClient from '../utils/axios';
-import AddToCart from '../components/AddToCartButton.vue';
 
 
 const crops = ref([]);
@@ -43,7 +42,7 @@ const fetchCrops = async () => {
     const response = await apiClient.get('/custom/crops');
     crops.value = response.data.map(crop => ({
       ...crop,
-      plantingDate: new Date(crop.plantingdate).toISOString().split('T')[0]
+      plantingDate: new Date(crop.planting_date).toISOString().split('T')[0]
     }));
   } catch (error) {
     console.error('获取作物列表失败:', error);
