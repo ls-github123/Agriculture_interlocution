@@ -130,8 +130,10 @@ class OrderListView(APIView):
 
     def get(self, request):
         try:
-            # 获取所有订单
-            orders = agr_Order.objects.all()
+            # 获取所有订单，按创建时间倒序排序
+            orders = agr_Order.objects.all().order_by('-created_at')
+            
+            # 将订单数据转换为字典格式
             orders_data = [
                 {
                     "id": order.id,
@@ -140,8 +142,12 @@ class OrderListView(APIView):
                 }
                 for order in orders
             ]
+            
+            # 返回排序后的订单数据
             return Response(orders_data)
+        
         except Exception as e:
+            # 如果发生异常，返回错误信息
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 

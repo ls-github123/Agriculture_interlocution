@@ -4,22 +4,25 @@
     <button class="back-btn" @click="goBack">← 返回</button>
 
     <h1 class="title">商品列表</h1>
+
     <div class="product-grid">
       <div v-for="product in products" :key="product.id" class="product-card">
         <!-- 商品图片 -->
         <div class="product-image">
-          <img :src="product.image_url || 'https://via.placeholder.com/250x250.png?text=商品图片'" alt="Product Image">
+          <img :src="getImageUrl(product.image)" alt="Product Image">
         </div>
 
         <div class="product-info">
           <h3 class="product-name">{{ product.name }}</h3>
           <p class="product-price">{{ product.price }}元</p>
+          <!-- 数量选择 -->
+          <input type="number" v-model.number="product.quantity" min="1" placeholder="数量" class="quantity-input" />
         </div>
 
-        <button class="add-to-cart-btn" @click="addToCart(product.id)">加入购物车</button>
+        <button class="add-to-cart-btn" @click="addToCart(product)">加入购物车</button>
       </div>
     </div>
-    
+
     <!-- 跳转到购物车页面的按钮 -->
     <div class="cart-btn-container">
       <button class="cart-btn" @click="goToCart">查看购物车</button>
@@ -29,6 +32,7 @@
 
 <script>
 import axios from 'axios';
+import blobConfig from '../config/blobConfig';
 
 export default {
   data() {
@@ -44,19 +48,32 @@ export default {
     async fetchProducts() {
       try {
         const response = await axios.get('http://localhost:8000/agri_cart/products/');
-        this.products = response.data;
+        // 设置默认数量为1
+        this.products = response.data.map(product => ({
+          ...product,
+          quantity: 1 // 默认数量
+        }));
       } catch (error) {
         console.error('Failed to fetch products:', error);
       }
     },
 
+    // 拼接图片URL
+    getImageUrl(imageName) {
+      return imageName ? `${blobConfig.baseBlobUrl}/cart/${imageName}` : 'https://via.placeholder.com/250x250.png?text=商品图片';
+    },
+
     // 将商品添加到购物车
-    async addToCart(productId) {
+    async addToCart(product) {
       try {
-        await axios.post('http://localhost:8000/agri_cart/cart/add/', { product_id: productId, quantity: 1 });
+        await axios.post('http://localhost:8000/agri_cart/cart/add/', {
+          product_id: product.id,
+          quantity: product.quantity
+        });
         alert('商品已加入购物车');
       } catch (error) {
         console.error('Failed to add product to cart:', error);
+        alert('添加到购物车失败，请稍后再试。');
       }
     },
 
@@ -107,8 +124,15 @@ export default {
   font-weight: bold;
   text-align: center;
   color: #333;
-  margin-top: 60px; /* 增加顶部空间以避免与返回按钮重叠 */
+  margin-top: 60px;
   margin-bottom: 30px;
+}
+
+/* 加载和错误样式 */
+.loading, .error {
+  text-align: center;
+  color: #666;
+  font-size: 1.2em;
 }
 
 /* 商品网格布局 */
@@ -122,7 +146,6 @@ export default {
 .product-card {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   background-color: #fff;
   padding: 15px;
   border-radius: 8px;
@@ -137,8 +160,8 @@ export default {
 /* 商品图片 */
 .product-image {
   width: 100%;
-  height: 250px; /* 图片的高度，确保一致 */
-  overflow: hidden; /* 隐藏超出范围的部分 */
+  height: 250px;
+  overflow: hidden;
   border-radius: 8px;
   margin-bottom: 15px;
 }
@@ -146,7 +169,7 @@ export default {
 .product-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* 确保图片覆盖整个区域并保持比例 */
+  object-fit: cover;
 }
 
 /* 商品信息 */
@@ -202,5 +225,13 @@ export default {
 
 .cart-btn:hover {
   background-color: #0056b3;
+}
+
+.quantity-input {
+  width: 100%;
+  padding: 5px;
+  margin-top: 5px;
+  font-size: 1em;
+  text-align: center;
 }
 </style>
