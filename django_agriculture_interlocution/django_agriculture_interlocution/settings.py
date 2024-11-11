@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'servers',#子应用-服务模块
     'customized',#子应用-定制服务模块
     'agri_cart',
+    'map',
 ]
 
 

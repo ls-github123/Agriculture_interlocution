@@ -12,10 +12,11 @@ const Service = () => import('../view/Service.vue');
 const ExpertGen = () => import('../view/ExpertGen.vue');
 const HarvestingFrom = () => import('../view/HarvestingFrom.vue');
 const IrrigationFrom = () => import ('../view/IrrigationFrom.vue');
-const PlantFrom = () => import ('../view/PlantFrom.vue');
-const AddCrop =()=>import('../view/AddCrop.vue');
+const PlantingService = () => import ('../view/PlantingService.vue');
+const Map = () => import ('../view/Map.vue');
 // 引入认证相关函数
 import { getAuthorizationCode, fetchAndStoreTokens, isAuthenticated } from '../utils/authing';
+
 
 
 
@@ -32,8 +33,8 @@ const routes = [
     { path:'/expert',name:'expertgen',component:ExpertGen },//专家
     { path:'/harvesting',name:'harvest',component:HarvestingFrom },//收割服务
     { path:'/irrigation',component:IrrigationFrom },//灌溉服务
-    {path:'/plant',name:'plantfrom',component:PlantFrom},//种植服务1
-    {path:'/add',name:'addcrop',component:AddCrop},//种植服务2
+    {path:'/plant',name:'planttingservice',component:PlantingService},//种植服务
+    {path:'/map',name:'map',component:Map},//地图服务
 ];
 
 // 创建路由实例

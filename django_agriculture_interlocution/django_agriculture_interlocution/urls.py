@@ -24,4 +24,6 @@ urlpatterns = [
     path('custom/',include('customized.urls')), #子应用-定制模块
     path('agri_cart/', include('agri_cart.urls')),  # 引入 agri_cart 子应用路由
     path('essearch/', include('essearch.urls')),
+    path('map/', include('map.urls')),#子应用
 ]
+
