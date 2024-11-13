@@ -42,14 +42,18 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders', # 跨域配置
+    'channels', # WebSockets、聊天应用功能支持
     'rest_framework', # DRF支持
     'usermodule', # 子应用-用户模块
     'essearch', # es 搜索
     'servers',#子应用-服务模块
     'customized',#子应用-定制服务模块
     'agri_cart',
+    'websocket_model', # 集成websocket的大模型智能问答模块
 ]
 
+# 定义 ASGI 应用
+ASGI_APPLICATION = 'django_agriculture_interlocution.asgi.application'
 
 
 # 设置Django AUTH 用户认证系统所需用户模型
@@ -68,15 +72,15 @@ MIDDLEWARE = [
 ]
 
 # 跨域请求设置
-# CORS_ALLOWED_ORIGINS = [
-#     'http://localhost:5173',
-# ]
+CORS_ALLOWED_ORIGINS = [
+    'http://127.0.0.1:5173',
+]
 
 CORS_ALLOW_CREDENTIALS = True  # 允许发送 Cookie
 
 # CSRF 信任来源
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:5173'
+    'http://127.0.0.1:5173'
 ]
 
 ROOT_URLCONF = 'django_agriculture_interlocution.urls'
@@ -152,17 +156,6 @@ CACHES = {
             "CONNECTION_POOL_KWARGS": {"max_connections": 100}
         }
     },
-    
-    # 配置站点 短信验证码
-    "sms_code": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/2",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            # 连接池的配置
-            "CONNECTION_POOL_KWARGS": {"max_connections": 100}
-        }
-    },
 }
 
 # session存储配置
@@ -170,6 +163,17 @@ CACHES = {
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 # 指定缓存的别名
 SESSION_CACHE_ALIAS = "session"
+
+
+# 配置 Channels 使用 Redis 作为频道层后端
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}/2"],
+        },
+    },
+}
 
 
 # Password validation
